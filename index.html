@@ -79,6 +79,7 @@ p{margin:0}
 details summary{cursor:pointer;font-weight:600;color:var(--muted)}
 details[open] summary{margin-bottom:12px}
 .btn{border:1px solid var(--line);background:var(--desk);border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;transition:transform .12s ease, background .12s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+a.btn{color:var(--text)}
 .btn:hover{transform:translateY(-1px);background:var(--line)}
 .btn:active{transform:translateY(1px)}
 .btn.big{font-family:var(--stencil);font-weight:900;font-size:26px;letter-spacing:.06em;text-transform:uppercase;padding:14px 26px;background:var(--stamp);border-color:transparent;color:#fff}
@@ -169,6 +170,28 @@ details[open] summary{margin-bottom:12px}
 .idea{background:var(--desk);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;animation:in .3s both}
 .idea span:last-child{font-family:var(--type);color:var(--lamp);white-space:nowrap;font-variant-numeric:tabular-nums}
 textarea.inp{resize:vertical;min-height:52px}
+
+/* Carta de deseos */
+.wl{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.wi{background:var(--desk);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-width:0;animation:in .3s both}
+.wi .ph{position:relative;aspect-ratio:4/3;max-width:100%;background:var(--desk-2);display:grid;place-items:center;overflow:hidden}
+.wi .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.wi .ph span{font-family:var(--stencil);font-weight:900;font-size:56px;color:var(--line)}
+.wi .bd{padding:12px 14px 14px;display:grid;gap:6px;align-content:start;min-width:0}
+.wi .t{font-weight:700;overflow-wrap:anywhere;display:flex;gap:8px;align-items:baseline}
+.wi .t .n{font-family:var(--stencil);font-weight:900;color:var(--lamp);font-size:20px}
+.wi .meta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--type);font-size:12px;color:var(--muted)}
+.wi .meta .pr{color:var(--lamp);font-variant-numeric:tabular-nums}
+.wi .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.wi .btn:disabled{opacity:.35;cursor:default;transform:none}
+.wempty{grid-column:1/-1;display:grid;gap:4px;border:1px dashed var(--line);border-radius:12px;padding:18px;color:var(--muted)}
+.wempty b{color:var(--text)}
+.wform{display:grid;gap:14px;border:1px solid var(--line);background:var(--desk);border-radius:12px;padding:16px}
+.photo-pick{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.photo-pick .inp{flex:1 1 200px;width:auto}
+.thumb{width:64px;height:64px;border-radius:8px;object-fit:cover;background:#fff;border:1px solid var(--line);flex:none}
+.kv-dark{color:var(--text)}
+.kv-dark dt{color:var(--muted)}
 
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
 .foot{text-align:center;color:var(--muted);font-family:var(--type);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
@@ -487,16 +510,50 @@ function renderDossier(o){
     <div class="row"><button class="btn sm" type="button" id="more">Otras ideas</button></div>
   </section>
 
-  <section class="panel extra" id="ficha" hidden aria-labelledby="h-fc">
-    <div class="head"><h2 id="h-fc">Tu ficha</h2><span class="label">Para tu agente</span></div>
-    <p class="note">Alguien te está buscando regalo y no sabes quién. Rellena tu ficha y mándala al grupo: tu agente la verá sin delatarse.</p>
-    <div class="grid">
-      <div class="field"><label for="w1">Me flipa…</label><textarea class="inp" id="w1">${esc(wish.w1||"")}</textarea></div>
-      <div class="field"><label for="w2">Me haría ilusión…</label><textarea class="inp" id="w2">${esc(wish.w2||"")}</textarea></div>
-      <div class="field"><label for="w3">Ni se te ocurra regalarme…</label><textarea class="inp" id="w3">${esc(wish.w3||"")}</textarea></div>
-      <div class="field"><label for="w4">Talla (por si es ropa)</label><input class="inp" id="w4" value="${esc(wish.w4||"")}"></div>
+  <section class="panel extra" id="carta" hidden aria-labelledby="h-fc">
+    <div class="head"><h2 id="h-fc">Mi carta de deseos</h2><span class="label">Para tu agente</span></div>
+    <p class="note">Alguien te está buscando regalo y no sabes quién. Apunta lo que te gustaría recibir, con enlace y foto si quieres, y manda la carta al grupo: tu agente la verá sin delatarse. Lo que más ilusión te haga, arriba del todo.</p>
+
+    <div class="wl" id="wl"></div>
+
+    <form class="wform" id="wf" autocomplete="off">
+      <span class="label" id="wfh">Añadir un deseo</span>
+      <div class="grid">
+        <div class="field"><label for="wt">Qué es *</label><input class="inp" id="wt" placeholder="Ej.: sudadera del Málaga" maxlength="80"></div>
+        <div class="field"><label for="wu">Enlace a la tienda</label><input class="inp" id="wu" inputmode="url" placeholder="https://www.amazon.es/…"></div>
+        <div class="field"><label for="wp">Precio aprox. (€)</label><input class="inp" id="wp" inputmode="decimal" placeholder="15" maxlength="8"></div>
+        <div class="field"><label for="wn">Detalles</label><input class="inp" id="wn" placeholder="Color, talla, modelo…" maxlength="120"></div>
+      </div>
+      <div class="photo-pick">
+        <img class="thumb" id="wthumb" alt="Foto del deseo" hidden>
+        <button class="btn sm" type="button" id="wpick">Subir foto</button>
+        <input type="file" id="wfile" accept="image/*" hidden>
+        <input class="inp" id="wiu" inputmode="url" placeholder="…o pega el enlace de una imagen">
+        <button class="btn sm" type="button" id="wclr" hidden>Quitar foto</button>
+      </div>
+      <div class="row">
+        <button class="btn" type="submit" id="wsave">Añadir a mi carta</button>
+        <button class="btn sm" type="button" id="wcancel" hidden>Cancelar</button>
+        <span class="msg" id="wmsg" role="status"></span>
+      </div>
+    </form>
+
+    <details>
+      <summary>Más pistas para tu agente</summary>
+      <div class="grid">
+        <div class="field"><label for="w1">Me flipa…</label><textarea class="inp" id="w1"></textarea></div>
+        <div class="field"><label for="w2">Me haría ilusión algo de…</label><textarea class="inp" id="w2"></textarea></div>
+        <div class="field"><label for="w3">Ni se te ocurra regalarme…</label><textarea class="inp" id="w3"></textarea></div>
+        <div class="field"><label for="w4">Talla (por si es ropa)</label><input class="inp" id="w4"></div>
+      </div>
+    </details>
+
+    <div class="row">
+      <a class="btn wa" id="wsend" href="#" target="_blank" rel="noopener">Enviar mi carta al grupo</a>
+      <button class="btn sm" type="button" id="wcopy">Copiar enlace</button>
+      <a class="btn sm" id="wview" href="#" target="_blank" rel="noopener">Ver cómo queda</a>
     </div>
-    <div class="row"><a class="btn wa" id="wsend" href="#" target="_blank" rel="noopener">Enviar mi ficha al grupo</a></div>
+    <p class="note" id="wsize">Truco: si pegas el enlace de Amazon o de otra tienda, WhatsApp ya enseña la foto del producto.</p>
   </section>
   <p class="foot">Shhh · No se lo digas a nadie</p>`;
 
@@ -524,7 +581,7 @@ function renderDossier(o){
     if(revealed) return; revealed=true;
     cv.classList.add("gone"); $("#tip").textContent="Objetivo confirmado"; $("#skip").hidden=true;
     setTimeout(()=>{ $("#as").classList.add("on"); navigator.vibrate&&navigator.vibrate([40,40,80]); shreds(2200) }, reduced()?0:350);
-    setTimeout(()=>{ ["#post","#extras","#ficha"].forEach(s=>$(s).hidden=false); startCountdown(o.d); showIdeas(budget) }, reduced()?0:900);
+    setTimeout(()=>{ ["#post","#extras","#carta"].forEach(s=>$(s).hidden=false); startCountdown(o.d); showIdeas(budget) }, reduced()?0:900);
   };
   cv.addEventListener("pointerdown",e=>{ cv.setPointerCapture(e.pointerId); last=pos(e); scratch(last,[last[0]+.1,last[1]]) });
   cv.addEventListener("pointermove",e=>{ if(!last||revealed) return; const p=pos(e); scratch(last,p); last=p; if(++moves%12===0&&cleared()>.5) reveal() });
@@ -533,17 +590,164 @@ function renderDossier(o){
   $("#skip").onclick=reveal;
   $("#hide").onclick=()=>{ clearInterval(window.__cd); renderGate(o) };
 
-  // Ficha para el grupo
-  const sendLink=()=>{
-    const w={w1:$("#w1").value.trim(),w2:$("#w2").value.trim(),w3:$("#w3").value.trim(),w4:$("#w4").value.trim()};
-    store.set(wishKey,w);
-    const t=`🗂️ Ficha del agente ${o.g}\n`+
-      (w.w1?`• Me flipa: ${w.w1}\n`:"")+(w.w2?`• Me haría ilusión: ${w.w2}\n`:"")+
-      (w.w3?`• Ni se te ocurra: ${w.w3}\n`:"")+(w.w4?`• Talla: ${w.w4}\n`:"")+`(${o.e||"Amigo Invisible"})`;
-    $("#wsend").href="https://wa.me/?text="+encodeURIComponent(t);
-  };
-  ["#w1","#w2","#w3","#w4"].forEach(s=>$(s).addEventListener("input",sendLink)); sendLink();
+  bindCarta(o, wish);
   $("#more").onclick=()=>showIdeas(budget);
+}
+
+// ================== Carta de deseos ==================
+const safeUrl = u => { u=String(u||"").trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u;
+  try{ const x=new URL(u); return /^https?:$/.test(x.protocol)&&x.hostname.includes(".") ? x.href : "" }catch{ return "" } };
+const safeImg = s => /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(s||"") ? s : safeUrl(s);
+const host = u => { try{ return new URL(u).hostname.replace(/^www\./,"") }catch{ return "" } };
+
+function b64u(bytes){ let s=""; for(let i=0;i<bytes.length;i+=0x8000) s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"") }
+function unb64u(t){ let s=t.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; const b=atob(s), u=new Uint8Array(b.length);
+  for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u }
+async function packCarta(obj){
+  const bytes=new TextEncoder().encode(JSON.stringify(obj));
+  if(window.CompressionStream){
+    try{ const st=new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+      return "w"+b64u(new Uint8Array(await new Response(st).arrayBuffer())) }catch{}
+  }
+  return "x"+b64u(bytes);
+}
+async function unpackCarta(t){
+  try{
+    let bytes=unb64u(t.slice(1));
+    if(t[0]==="w"){ const st=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw")); bytes=new Uint8Array(await new Response(st).arrayBuffer()) }
+    const c=JSON.parse(new TextDecoder().decode(bytes));
+    if(!c||!c.n||!Array.isArray(c.it)) return null;
+    c.it=c.it.slice(0,20).map(x=>({t:String(x.t||"").slice(0,80),u:safeUrl(x.u),p:String(x.p||"").slice(0,8),n:String(x.n||"").slice(0,120),i:safeImg(x.i)})).filter(x=>x.t);
+    c.f=c.f||{}; return c;
+  }catch{ return null }
+}
+// Reduce la foto a una miniatura para que quepa en el enlace
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image(); await new Promise((ok,ko)=>{ img.onload=ok; img.onerror=ko; img.src=url });
+    const k=Math.min(1,200/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement("canvas"); c.width=Math.max(1,Math.round(img.naturalWidth*k)); c.height=Math.max(1,Math.round(img.naturalHeight*k));
+    const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height);
+    let d=c.toDataURL("image/webp",.55); if(!d.startsWith("data:image/webp")) d=c.toDataURL("image/jpeg",.6);
+    return d;
+  } finally { URL.revokeObjectURL(url) }
+}
+
+function itemCard(x,i,edit){
+  return `<article class="wi">
+    <div class="ph">${x.i?`<img src="${esc(x.i)}" alt="${esc(x.t)}" loading="lazy">`:""}<span>${esc((x.t||"?")[0].toUpperCase())}</span></div>
+    <div class="bd">
+      <span class="t"><span class="n">${i+1}</span>${esc(x.t)}</span>
+      <div class="meta">${x.p?`<span class="pr">~${esc(x.p)} €</span>`:""}${x.u?`<span>${esc(host(x.u))}</span>`:""}</div>
+      ${x.n?`<p class="note">${esc(x.n)}</p>`:""}
+      <div class="acts">
+        ${x.u?`<a class="btn sm" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer">Ver en la tienda</a>`:""}
+        ${edit?`<button class="btn sm" type="button" data-up="${i}" ${i?"":"disabled"} aria-label="Subir prioridad">▲</button>
+          <button class="btn sm" type="button" data-ed="${i}">Editar</button>
+          <button class="btn sm" type="button" data-rm="${i}">Quitar</button>`:""}
+      </div>
+    </div>
+  </article>`;
+}
+const fixImgs = root => $$(".ph img",root).forEach(im=>{ const f=()=>im.remove(); im.complete&&!im.naturalWidth&&im.src ? f() : im.addEventListener("error",f) });
+
+function cartaText(c,url){
+  let t=`🎁 Carta de deseos de ${c.n}\n`;
+  c.it.forEach((x,i)=>{ t+=`\n${i+1}. ${x.t}${x.p?` (~${x.p} €)`:""}`; if(x.n) t+=`\n   ${x.n}`; if(x.u) t+=`\n   ${x.u}` });
+  const f=c.f||{};
+  if(f.w1||f.w2||f.w3||f.w4) t+="\n";
+  if(f.w1) t+=`\n• Me flipa: ${f.w1}`; if(f.w2) t+=`\n• Me haría ilusión algo de: ${f.w2}`;
+  if(f.w3) t+=`\n• Ni se te ocurra: ${f.w3}`; if(f.w4) t+=`\n• Talla: ${f.w4}`;
+  t+= url ? `\n\n📸 Con fotos: ${url}` : `\n\n📸 La carta con fotos te la paso aparte.`;
+  return t;
+}
+
+function bindCarta(o, oldFicha){
+  const key="carta-"+o.g;
+  const C=store.get(key)||{f:{w1:oldFicha.w1||"",w2:oldFicha.w2||"",w3:oldFicha.w3||"",w4:oldFicha.w4||""},it:[]};
+  let editing=-1, img="", seq=0, link="";
+  ["w1","w2","w3","w4"].forEach(k=>{ const el=$("#"+k); el.value=C.f[k]||""; el.addEventListener("input",()=>{ C.f[k]=el.value.trim(); persist() }) });
+
+  const persist=()=>{ store.set(key,C); share() };
+  const share=async()=>{
+    const my=++seq;
+    const tok=await packCarta({n:o.g,e:o.e,f:C.f,it:C.it});
+    if(my!==seq) return;
+    link=BASE+"#"+tok;
+    const empty=!C.it.length&&!Object.values(C.f).some(Boolean);
+    let wa="https://wa.me/?text="+encodeURIComponent(cartaText({n:o.g,f:C.f,it:C.it},link));
+    const long = wa.length>6000;
+    if(long) wa="https://wa.me/?text="+encodeURIComponent(cartaText({n:o.g,f:C.f,it:C.it},""));
+    const a=$("#wsend"); a.href=wa; a.toggleAttribute("aria-disabled",empty); a.style.opacity=empty?.5:1; a.style.pointerEvents=empty?"none":"";
+    $("#wview").href=link;
+    const hasPhoto=C.it.some(x=>x.i&&x.i.startsWith("data:"));
+    $("#wsize").textContent = long
+      ? "Tu carta lleva muchas fotos subidas y el enlace es muy largo para meterlo en el WhatsApp. Manda primero la lista y luego pega el enlace con «Copiar enlace»."
+      : hasPhoto ? "Las fotos subidas van dentro del enlace en miniatura. Si añades muchas, el enlace se hace muy largo."
+      : "Truco: si pegas el enlace de Amazon o de otra tienda, WhatsApp ya enseña la foto del producto.";
+  };
+
+  const draw=()=>{
+    const wl=$("#wl");
+    wl.innerHTML = C.it.length ? C.it.map((x,i)=>itemCard(x,i,true)).join("")
+      : `<div class="wempty"><b>Tu carta está vacía</b><span>Añade abajo lo primero que te gustaría recibir.</span></div>`;
+    fixImgs(wl);
+    $$("[data-rm]",wl).forEach(b=>b.onclick=()=>{ C.it.splice(+b.dataset.rm,1); if(editing>=0) resetForm(); persist(); draw() });
+    $$("[data-up]",wl).forEach(b=>b.onclick=()=>{ const i=+b.dataset.up; [C.it[i-1],C.it[i]]=[C.it[i],C.it[i-1]]; persist(); draw() });
+    $$("[data-ed]",wl).forEach(b=>b.onclick=()=>{ const i=+b.dataset.ed, x=C.it[i]; editing=i;
+      $("#wt").value=x.t; $("#wu").value=x.u; $("#wp").value=x.p; $("#wn").value=x.n; setImg(x.i);
+      $("#wiu").value = x.i&&!x.i.startsWith("data:") ? x.i : "";
+      $("#wfh").textContent="Editando el deseo "+(i+1); $("#wsave").textContent="Guardar cambios"; $("#wcancel").hidden=false;
+      $("#wf").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"}); $("#wt").focus() });
+  };
+  const setImg=v=>{ img=v||""; const th=$("#wthumb"); th.hidden=!img; if(img) th.src=img; else th.removeAttribute("src"); $("#wclr").hidden=!img };
+  const resetForm=()=>{ editing=-1; $("#wf").reset(); setImg(""); $("#wfh").textContent="Añadir un deseo"; $("#wsave").textContent="Añadir a mi carta"; $("#wcancel").hidden=true; $("#wmsg").textContent="" };
+
+  $("#wthumb").addEventListener("error",()=>{ if(img&&!img.startsWith("data:")){ $("#wmsg").textContent="Esa imagen no se puede cargar. Prueba con otra o súbela."; setImg("") } });
+  $("#wpick").onclick=()=>$("#wfile").click();
+  $("#wfile").onchange=async e=>{ const f=e.target.files[0]; if(!f) return;
+    $("#wmsg").textContent="Preparando foto…";
+    try{ setImg(await shrink(f)); $("#wiu").value=""; $("#wmsg").textContent="" }catch{ $("#wmsg").textContent="No se pudo leer esa foto. Prueba con otra." }
+    e.target.value="" };
+  $("#wiu").addEventListener("input",e=>{ const u=safeUrl(e.target.value); if(u||!e.target.value) { $("#wmsg").textContent=""; setImg(u) } });
+  $("#wclr").onclick=()=>{ setImg(""); $("#wiu").value="" };
+  $("#wcancel").onclick=resetForm;
+  $("#wf").onsubmit=e=>{
+    e.preventDefault();
+    const t=$("#wt").value.trim(); if(!t){ $("#wmsg").textContent="Pon al menos qué es."; $("#wt").focus(); return }
+    const raw=$("#wu").value.trim(), u=safeUrl(raw);
+    if(raw&&!u){ $("#wmsg").textContent="Ese enlace no parece una web. Cópialo entero desde la tienda."; $("#wu").focus(); return }
+    if(editing<0 && C.it.length>=20){ $("#wmsg").textContent="Máximo 20 deseos. ¡No te pases!"; return }
+    const x={t,u,p:$("#wp").value.trim().replace(/[^\d.,]/g,""),n:$("#wn").value.trim(),i:img};
+    if(editing>=0) C.it[editing]=x; else C.it.push(x);
+    resetForm(); persist(); draw();
+    $("#wmsg").textContent="Guardado en tu carta.";
+  };
+  $("#wcopy").onclick=()=>{ const b=$("#wcopy");
+    const ok=()=>{ b.textContent="¡Copiado!"; setTimeout(()=>b.textContent="Copiar enlace",1500) };
+    const fail=()=>{ $("#wsize").textContent=link; const r=document.createRange(); r.selectNodeContents($("#wsize")); const s=getSelection(); s.removeAllRanges(); s.addRange(r) };
+    try{ navigator.clipboard.writeText(link).then(ok,fail) }catch{ fail() } };
+  draw(); share();
+}
+
+function renderCarta(c){
+  const f=c.f||{};
+  $("#app").innerHTML=`
+  <div class="strip"><span>Información del objetivo</span><span>Carta de deseos</span><span>${esc(code(c.n))}</span></div>
+  <header class="hero">
+    <span class="label">${esc(c.e||"Amigo Invisible")}</span>
+    <h1>Carta de<em>${esc(c.n)}</em></h1>
+    <p>Si eres su amigo invisible, toma nota y disimula. Están por orden: lo primero es lo que más ilusión le haría.</p>
+  </header>
+  ${c.it.length?`<section class="wl">${c.it.map((x,i)=>itemCard(x,i,false)).join("")}</section>`:""}
+  ${(f.w1||f.w2||f.w3||f.w4)?`<section class="panel"><h2>Más pistas</h2><dl class="kv kv-dark">
+    ${f.w1?`<dt>Le flipa</dt><dd>${esc(f.w1)}</dd>`:""}${f.w2?`<dt>Le haría ilusión</dt><dd>${esc(f.w2)}</dd>`:""}
+    ${f.w3?`<dt>Ni se te ocurra</dt><dd>${esc(f.w3)}</dd>`:""}${f.w4?`<dt>Talla</dt><dd>${esc(f.w4)}</dd>`:""}</dl></section>`:""}
+  ${!c.it.length&&!(f.w1||f.w2||f.w3||f.w4)?`<p class="note">Esta carta está vacía.</p>`:""}
+  <p class="foot">Shhh · Que no te pillen mirando</p>`;
+  fixImgs($("#app"));
 }
 
 function showIdeas(budget){
@@ -589,6 +793,7 @@ function route(){
   clearInterval(window.__cd);
   const h=location.hash.slice(1);
   if(!h) return renderHQ();
+  if(h[0]==="w"||h[0]==="x"){ unpackCarta(h).then(c=>c?renderCarta(c):renderBroken()); scrollTo(0,0); return }
   const o=decode(h); o?renderGate(o):renderBroken();
   scrollTo(0,0);
 }
