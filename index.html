@@ -5,29 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f1720">
 <title>Operación Amigo Invisible</title>
-<meta name="description" content="Sorteo secreto del amigo invisible: cada agente recibe su expediente clasificado.">
+<meta name="description" content="Apúntate, escribe tu carta de deseos y descubre a quién le haces el regalo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;900&family=Special+Elite&family=Archivo:wght@400;500;600;700&display=swap">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='14' width='52' height='40' rx='4' fill='%23d9c08a'/%3E%3Cpath d='M6 18h20l4 6h28' fill='none' stroke='%238a6d34' stroke-width='3'/%3E%3Crect x='14' y='32' width='36' height='8' fill='%23111'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='14' width='52' height='40' rx='4' fill='%23e2cc98'/%3E%3Cpath d='M6 18h20l4 6h28' fill='none' stroke='%238a6d34' stroke-width='3'/%3E%3Crect x='14' y='32' width='36' height='8' fill='%23111'/%3E%3C/svg%3E">
 <style>
-/* Concepto: mesa de operaciones de noche. La central reparte expedientes (carpetas manila);
-   cada agente desbloquea el suyo con la huella y rasca la franja tachada para ver su objetivo.
+/* Concepto: mesa de operaciones de noche. Cada agente se registra con su PIN y deja su carta;
+   la central sortea; cada uno abre su expediente con la huella y rasca para ver su objetivo.
    Un solo tema oscuro a propósito: es una operación nocturna. */
 :root{
   color-scheme:dark;
-  --desk:#0f1720;          /* mesa de noche */
-  --desk-2:#16212d;
-  --manila:#e2cc98;        /* carpeta */
-  --manila-2:#d3b979;
-  --manila-ink:#2b2416;    /* tinta máquina de escribir */
-  --stamp:#d2323c;         /* sello CONFIDENCIAL */
-  --lamp:#ffc857;          /* luz del flexo */
-  --text:#e9edf2;
-  --muted:#93a1b1;
-  --line:#2a3a4b;
-  --ok:#57c785;
-  --redact:#0b0b0d;
+  --desk:#0f1720; --desk-2:#16212d; --desk-3:#1d2b3a;
+  --manila:#e2cc98; --manila-ink:#2b2416;
+  --stamp:#d2323c; --lamp:#ffc857;
+  --text:#e9edf2; --muted:#93a1b1; --line:#2a3a4b; --ok:#57c785;
   --stencil:"Big Shoulders Stencil Display",Impact,"Arial Narrow",sans-serif;
   --type:"Special Elite","Courier New",Courier,monospace;
   --ui:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -46,110 +38,112 @@ button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--lamp);outline-offset:3px}
 .wrap{max-width:920px;margin:0 auto;padding-inline:16px;padding-block:20px 72px;display:grid;gap:26px}
 h1,h2,h3{margin:0;font-family:var(--stencil);font-weight:900;line-height:.95;text-transform:uppercase;letter-spacing:.02em;text-wrap:balance}
-.label{font-family:var(--type);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 p{margin:0}
+.label{font-family:var(--type);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.note{color:var(--muted);font-size:14px}
+.msg{color:var(--stamp);font-weight:600;font-size:14px;min-height:1.2em}
+.msg.good{color:var(--ok)}
 
-/* Franja de clasificación */
 .strip{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--type);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
   color:var(--stamp);border-block:1px dashed rgba(210,50,60,.45);padding-block:6px}
 .hero{display:grid;gap:12px}
-.hero h1{font-size:clamp(52px,13vw,128px);color:var(--text)}
+.hero h1{font-size:clamp(52px,13vw,120px)}
 .hero h1 em{font-style:normal;color:var(--lamp);display:block}
 .hero p{max-width:58ch;color:var(--muted)}
 
-/* Paneles de la central */
-.panel{background:var(--desk-2);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:18px}
-.panel h2{font-size:34px}
-.panel .head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.panel{background:var(--desk-2);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:18px;min-width:0}
+.panel h2{font-size:32px}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
 .field{display:grid;gap:6px;min-width:0}
 .field label{font-size:13px;font-weight:600;color:var(--muted)}
 .inp{background:var(--desk);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-width:0}
-.inp:disabled{opacity:.6}
+textarea.inp{resize:vertical;min-height:52px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row .inp{flex:1 1 180px;width:auto}
 .switch{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
 .switch input{width:22px;height:22px;accent-color:var(--stamp);flex:none;margin-top:2px}
 .switch small{display:block;color:var(--muted)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{display:inline-flex;align-items:center;gap:8px;background:var(--desk);border:1px solid var(--line);border-radius:6px;padding:6px 6px 6px 12px;font-family:var(--type);font-size:15px}
-.chip .code{color:var(--lamp);font-size:12px}
-.chip button{border:0;background:transparent;width:28px;height:28px;border-radius:4px;cursor:pointer;color:var(--muted)}
-.chip button:hover{background:var(--line);color:var(--stamp)}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.row .inp{flex:1 1 180px;width:auto}
 details summary{cursor:pointer;font-weight:600;color:var(--muted)}
 details[open] summary{margin-bottom:12px}
-.btn{border:1px solid var(--line);background:var(--desk);border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;transition:transform .12s ease, background .12s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;justify-content:center}
-a.btn{color:var(--text)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--desk);border:1px solid var(--line);border-radius:6px;padding:6px 6px 6px 12px;font-family:var(--type);font-size:15px}
+.chip button{border:0;background:transparent;width:28px;height:28px;border-radius:4px;cursor:pointer;color:var(--muted)}
+.chip button:hover{background:var(--line);color:var(--stamp)}
+
+.btn{border:1px solid var(--line);background:var(--desk);color:var(--text);border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;
+  transition:transform .12s ease, background .12s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;justify-content:center}
 .btn:hover{transform:translateY(-1px);background:var(--line)}
 .btn:active{transform:translateY(1px)}
-.btn.big{font-family:var(--stencil);font-weight:900;font-size:26px;letter-spacing:.06em;text-transform:uppercase;padding:14px 26px;background:var(--stamp);border-color:transparent;color:#fff}
-.btn.big:hover{background:#e0414b}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.btn.big{font-family:var(--stencil);font-weight:900;font-size:24px;letter-spacing:.06em;text-transform:uppercase;padding:13px 24px;background:var(--stamp);border-color:transparent;color:#fff}
+.btn.big:hover:not(:disabled){background:#e0414b}
 .btn.wa{background:#1f8f55;border-color:transparent;color:#fff}
 .btn.wa:hover{background:#25a663}
 .btn.sm{padding:8px 12px;font-size:14px}
-.msg{color:var(--stamp);font-weight:600;font-size:14px;min-height:1.2em}
-.note{color:var(--muted);font-size:14px}
+.btn.ghost{background:transparent}
+.btn.danger{background:var(--stamp);border-color:transparent;color:#fff}
+.linkbtn{background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
 
-/* Expedientes (carpetas) de la central */
-.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px 16px;padding-top:14px}
-.folder{position:relative;background:var(--manila);color:var(--manila-ink);border-radius:0 10px 10px 10px;padding:18px;display:grid;gap:10px;min-width:0;
-  box-shadow:0 18px 30px -18px rgba(0,0,0,.8)}
-.folder::before{content:attr(data-tab);position:absolute;left:0;top:-22px;height:22px;padding:3px 14px 0;background:var(--manila);border-radius:8px 8px 0 0;
-  font-family:var(--type);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
-.folder .who{font-family:var(--stencil);font-weight:900;font-size:34px;line-height:1;text-transform:uppercase}
-.folder .lbl{font-family:var(--type);font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
-.folder .url{font-family:var(--type);font-size:11px;background:rgba(0,0,0,.08);border-radius:6px;padding:6px 8px;overflow-wrap:anywhere;max-height:3.6em;overflow:hidden}
-.folder .btns{display:flex;gap:8px;flex-wrap:wrap}
-.folder .btn{background:rgba(255,255,255,.45);border-color:rgba(0,0,0,.15);color:var(--manila-ink)}
-.folder .btn.wa{background:#1f8f55;color:#fff;border-color:transparent}
-.folder .sent{position:absolute;right:14px;top:12px;font-family:var(--stencil);font-weight:900;font-size:20px;color:#1f8f55;border:3px solid currentColor;padding:0 8px;transform:rotate(8deg);letter-spacing:.06em}
+/* Tablero de agentes */
+.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 12px;padding-top:12px}
+.agent{position:relative;display:grid;gap:4px;text-align:left;background:var(--manila);color:var(--manila-ink);border:0;border-radius:0 10px 10px 10px;
+  padding:16px 14px 14px;cursor:pointer;box-shadow:0 14px 24px -16px rgba(0,0,0,.8);transition:transform .15s}
+.agent::before{content:"";position:absolute;left:0;top:-12px;width:46%;height:12px;background:var(--manila);border-radius:6px 6px 0 0}
+.agent:hover{transform:translateY(-3px) rotate(-.6deg)}
+.agent .nm{font-family:var(--stencil);font-weight:900;font-size:28px;line-height:1;text-transform:uppercase;overflow-wrap:anywhere}
+.agent .st{font-family:var(--type);font-size:12px;letter-spacing:.06em}
+.agent .seal{position:absolute;right:10px;top:8px;font-family:var(--stencil);font-weight:900;font-size:13px;letter-spacing:.06em;border:2px solid currentColor;padding:0 6px;transform:rotate(8deg)}
+.agent.done .seal{color:#1d7a46}
+.agent.wait .seal{color:var(--stamp)}
 .progress{height:8px;background:var(--desk);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
 .progress span{display:block;height:100%;background:var(--ok);transition:width .4s}
+.phase{display:flex;gap:14px;align-items:flex-start;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;flex-wrap:wrap}
+.phase b:first-child{font-family:var(--stencil);font-weight:900;font-size:22px;letter-spacing:.04em;text-transform:uppercase;color:var(--lamp);white-space:nowrap}
+.phase span{flex:1 1 220px;min-width:0}
 
-/* Día D */
-.order{display:grid;gap:8px;counter-reset:o;margin:0;padding:0;list-style:none}
-.order li{counter-increment:o;display:flex;gap:12px;align-items:center;background:var(--desk);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-family:var(--type);font-size:18px;
-  animation:in .35s both}
-.order li::before{content:counter(o);font-family:var(--stencil);font-weight:900;color:var(--lamp);font-size:26px;width:1.4em;text-align:center}
-@keyframes in{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
-.rules{display:grid;gap:6px;color:var(--muted);font-size:15px;padding-left:20px;margin:0}
+/* PIN */
+.pinbox{display:grid;gap:14px;width:100%;max-width:420px}
+.pin{font-family:var(--stencil);font-weight:900;font-size:40px;letter-spacing:.5em;text-align:center;padding:10px 0 10px .5em}
+.center{display:grid;justify-items:center;text-align:center;gap:16px}
 
-/* Pantalla del agente: verificación por huella */
-.gate{display:grid;justify-items:center;text-align:center;gap:20px;padding-block:16px}
-.gate h1{font-size:clamp(46px,12vw,96px)}
-.gate h1 em{font-style:normal;color:var(--lamp)}
-.gate p{color:var(--muted);max-width:40ch}
+/* Pestañas del agente */
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font-family:var(--stencil);font-weight:900;font-size:22px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--text);border-color:var(--lamp)}
+.save{font-family:var(--type);font-size:13px;color:var(--muted)}
+.save.ok{color:var(--ok)} .save.bad{color:var(--stamp)}
+
+/* Huella */
 .finger{--p:0;position:relative;width:150px;height:150px;border-radius:50%;border:0;cursor:pointer;background:var(--desk-2);
   display:grid;place-items:center;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
   box-shadow:0 0 0 1px var(--line), 0 0 40px -10px rgba(255,200,87,calc(var(--p) * .9))}
-.finger::before{content:"";position:absolute;inset:-6px;border-radius:50%;
-  background:conic-gradient(var(--lamp) calc(var(--p)*360deg), transparent 0);
+.finger::before{content:"";position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(var(--lamp) calc(var(--p)*360deg), transparent 0);
   -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
           mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px))}
 .finger svg{width:84px;height:84px;color:color-mix(in srgb,var(--lamp) calc(var(--p)*100%), var(--muted))}
 .finger.scan svg{animation:scan .9s linear infinite}
 @keyframes scan{50%{filter:drop-shadow(0 0 8px var(--lamp))}}
-.finger-hint{font-family:var(--type);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 
-/* El expediente */
-.dossier{position:relative;background:var(--manila);color:var(--manila-ink);border-radius:4px 12px 12px 12px;padding:clamp(18px,5vw,40px);display:grid;gap:22px;
+/* Expediente */
+.dossier{position:relative;margin-top:28px;background:var(--manila);color:var(--manila-ink);border-radius:4px 12px 12px 12px;padding:clamp(18px,5vw,40px);display:grid;gap:22px;
   box-shadow:0 30px 60px -30px rgba(0,0,0,.9);animation:open .6s cubic-bezier(.2,1.2,.4,1) both;
   background-image:repeating-linear-gradient(180deg, transparent 0 27px, rgba(43,36,22,.08) 27px 28px)}
-.dossier::before{content:"EXPEDIENTE Nº " attr(data-num);position:absolute;left:0;top:-26px;height:26px;padding:5px 16px 0;background:var(--manila);border-radius:8px 8px 0 0;
-  font-family:var(--type);font-size:12px;letter-spacing:.14em}
+.dossier::before{content:"EXPEDIENTE Nº " attr(data-num);position:absolute;left:0;top:-26px;height:26px;padding:5px 16px 0;background:var(--manila);border-radius:8px 8px 0 0;font-family:var(--type);font-size:12px;letter-spacing:.14em}
 @keyframes open{from{opacity:0;transform:translateY(30px) rotate(-1.5deg)}to{opacity:1;transform:none}}
 .dossier .top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
 .dossier .stamp{font-family:var(--stencil);font-weight:900;color:var(--stamp);border:4px solid var(--stamp);padding:2px 12px;font-size:26px;letter-spacing:.08em;transform:rotate(-6deg);opacity:.85;mix-blend-mode:multiply}
+.dossier > * .label, .dossier > .top .label{color:inherit;opacity:.7}
+.dossier .locked .note, .dossier .mission .note{color:inherit;opacity:.75}
+.dossier > .btn, .dossier .locked .btn, #hide{background:rgba(255,255,255,.4);border-color:rgba(0,0,0,.2);color:var(--manila-ink)}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-family:var(--type);font-size:17px}
 .kv dt{text-transform:uppercase;letter-spacing:.1em;font-size:13px;opacity:.7;padding-top:3px}
-.kv dd{margin:0;min-width:0}
-.target{display:grid;gap:8px}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .scratch{position:relative;border-radius:6px;overflow:hidden;min-height:clamp(92px,22vw,150px);display:grid;place-items:center;background:#f4e7c3}
-.scratch .name{font-family:var(--stencil);font-weight:900;font-size:clamp(54px,15vw,120px);line-height:1;text-transform:uppercase;color:var(--stamp);padding:10px 16px;text-align:center}
+.scratch .name{font-family:var(--stencil);font-weight:900;font-size:clamp(50px,14vw,116px);line-height:1;text-transform:uppercase;color:var(--stamp);padding:10px 16px;text-align:center;overflow-wrap:anywhere}
 .scratch canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;transition:opacity .6s}
 .scratch canvas.gone{opacity:0;pointer-events:none}
 .scratch-tip{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:var(--type);font-size:13px;opacity:.8}
-.linkbtn{background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
 .assigned{position:absolute;right:6%;top:50%;font-family:var(--stencil);font-weight:900;color:#1d7a46;border:5px solid currentColor;padding:0 12px;font-size:clamp(24px,6vw,40px);
   letter-spacing:.08em;transform:translateY(-50%) rotate(-12deg) scale(2.4);opacity:0;pointer-events:none;mix-blend-mode:multiply}
 .assigned.on{animation:stamp .45s cubic-bezier(.3,1.5,.5,1) forwards}
@@ -161,20 +155,12 @@ a.btn{color:var(--text)}
 .count div{background:var(--manila-ink);color:var(--manila);border-radius:6px;padding:8px 10px;min-width:70px;text-align:center}
 .count strong{display:block;font-family:var(--stencil);font-weight:900;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
 .count span{font-family:var(--type);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
-.self-destruct{justify-self:start}
-.dossier .btn{background:rgba(255,255,255,.4);border-color:rgba(0,0,0,.2);color:var(--manila-ink)}
-
-/* Bloques extra del agente */
-.extra h2{font-size:30px}
-.ideas{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
-.idea{background:var(--desk);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;animation:in .3s both}
-.idea span:last-child{font-family:var(--type);color:var(--lamp);white-space:nowrap;font-variant-numeric:tabular-nums}
-textarea.inp{resize:vertical;min-height:52px}
+.locked{display:grid;gap:10px;justify-items:start}
 
 /* Carta de deseos */
 .wl{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
-.wi{background:var(--desk);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-width:0;animation:in .3s both}
-.wi .ph{position:relative;aspect-ratio:4/3;max-width:100%;background:var(--desk-2);display:grid;place-items:center;overflow:hidden}
+.wi{background:var(--desk);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-width:0;color:var(--text);animation:in .3s both}
+.wi .ph{position:relative;aspect-ratio:4/3;max-width:100%;background:var(--desk-3);display:grid;place-items:center;overflow:hidden}
 .wi .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
 .wi .ph span{font-family:var(--stencil);font-weight:900;font-size:56px;color:var(--line)}
 .wi .bd{padding:12px 14px 14px;display:grid;gap:6px;align-content:start;min-width:0}
@@ -182,68 +168,67 @@ textarea.inp{resize:vertical;min-height:52px}
 .wi .t .n{font-family:var(--stencil);font-weight:900;color:var(--lamp);font-size:20px}
 .wi .meta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--type);font-size:12px;color:var(--muted)}
 .wi .meta .pr{color:var(--lamp);font-variant-numeric:tabular-nums}
+.wi .note{color:var(--muted)}
 .wi .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
-.wi .btn:disabled{opacity:.35;cursor:default;transform:none}
 .wempty{grid-column:1/-1;display:grid;gap:4px;border:1px dashed var(--line);border-radius:12px;padding:18px;color:var(--muted)}
 .wempty b{color:var(--text)}
 .wform{display:grid;gap:14px;border:1px solid var(--line);background:var(--desk);border-radius:12px;padding:16px}
 .photo-pick{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .photo-pick .inp{flex:1 1 200px;width:auto}
 .thumb{width:64px;height:64px;border-radius:8px;object-fit:cover;background:#fff;border:1px solid var(--line);flex:none}
-.kv-dark{color:var(--text)}
-.kv-dark dt{color:var(--muted)}
+.tcarta{display:grid;gap:14px;background:var(--desk-2);border-radius:12px;padding:16px;color:var(--text)}
+.tcarta h3{font-size:26px}
+.tcarta .label{color:var(--muted);opacity:1}
+.tcarta .note{color:var(--muted)}
+.tcarta .kv{font-size:15px}
+.tcarta .kv dt{color:var(--muted);opacity:1}
+
+/* Ideas, Día D, tabla de la central */
+.ideas{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.idea{background:var(--desk);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;animation:in .3s both}
+.idea span:last-child{font-family:var(--type);color:var(--lamp);white-space:nowrap}
+.order{display:grid;gap:8px;counter-reset:o;margin:0;padding:0;list-style:none}
+.order li{counter-increment:o;display:flex;gap:12px;align-items:center;background:var(--desk);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-family:var(--type);font-size:18px;animation:in .35s both}
+.order li::before{content:counter(o);font-family:var(--stencil);font-weight:900;color:var(--lamp);font-size:26px;width:1.4em;text-align:center}
+.rules{display:grid;gap:6px;color:var(--muted);font-size:15px;padding-left:20px;margin:0}
+.tbl{overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:15px;min-width:440px}
+.tbl th{text-align:left;font-family:var(--type);font-weight:400;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+.tbl td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl td:nth-child(3){font-variant-numeric:tabular-nums}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:13px;font-weight:700}
+.pill.ok{background:rgba(87,199,133,.15);color:var(--ok)}
+.pill.no{background:rgba(210,50,60,.15);color:#ff7b82}
+.pill.lock{background:rgba(255,200,87,.15);color:var(--lamp)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
 .foot{text-align:center;color:var(--muted);font-family:var(--type);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-.shuffle{font-family:var(--stencil);font-weight:900;font-size:clamp(40px,10vw,80px);text-align:center;color:var(--lamp);text-transform:uppercase;min-height:1.1em}
+.loading{font-family:var(--type);color:var(--muted);text-align:center;padding-block:40px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <canvas id="fx" hidden></canvas>
-<main class="wrap" id="app"></main>
+<main class="wrap" id="app"><p class="loading">Conectando con la central…</p></main>
 
 <script>
 "use strict";
 // ================== Configuración ==================
-const DEFAULT = {
-  event:"Amigo Invisible 2026", budget:"20", date:"2026-12-24",
-  people:["Angel","Itziar","Carlos","Miguel","Jesús","Vari"], excl:[], missions:true
-};
-const KEY = "operacion-amigo-invisible-v2";
-const BASE = location.href.split("#")[0];
-
-const MISSIONS = [
-  "El regalo tiene que llevar algo de color rojo.",
-  "Envuélvelo con papel de periódico.",
-  "Mete dentro una nota escrita a mano con un recuerdo vuestro.",
-  "Una parte del regalo tiene que estar hecha por ti.",
-  "Tiene que incluir algo que se pueda comer.",
-  "Mete el regalo dentro de otra caja que despiste.",
-  "Escribe la tarjeta en verso, con rima.",
-  "Que lleve algo de Casarabonela o de Málaga.",
-  "El envoltorio tiene que ser lo más ridículo posible.",
-  "Que tenga que ver con una canción que le guste.",
-  "Incluye algo que le recuerde a cuando erais pequeños.",
-  "Firma la tarjeta con un nombre en clave, nunca con el tuyo.",
-  "Que se pueda usar todos los días.",
-  "Escóndele una pista falsa para que crea que eres otro."
-];
-const INITIAL_MISSION = "Algo del regalo tiene que empezar por la letra «%L»."; // se añade con la inicial del objetivo
+const API = "https://amigo-invisible.alvaroggcasarabonela.workers.dev";
+const PAGE = location.origin + location.pathname;
+const ME_KEY = "ai-me", ADMIN_KEY = "ai-admin";
 
 const IDEAS = [
   ["Calcetines absurdos a juego con su personalidad",7],["Bolsa de chuches de cuando erais pequeños",8],
   ["Entrada de cine para la peli que espera",9],["Suculenta con maceta pintada por ti",10],
   ["Libro de bolsillo de su autor favorito",11],["Taza con una foto vergonzosa del grupo",12],
   ["Juego de cartas rápido (Dobble, Virus!)",13],["Pack de cervezas artesanas raras",14],
-  ["Botella térmica de acero",15],["Funko de su serie favorita",15],
-  ["Lámpara de luna o de nubes",17],["Camiseta con una frase mítica del grupo",18],
-  ["Batería externa para el móvil",18],["Puzzle de 500 piezas con una foto vuestra",20],
-  ["Manta de sofá gordita",20],["Altavoz bluetooth pequeño",22],
-  ["Kit para hacer cócteles en casa",25],["Juego de mesa (Exploding Kittens, Código Secreto)",25],
-  ["Sudadera de su equipo o grupo favorito",30],["Experiencia: escape room para dos",40],
-  ["Auriculares inalámbricos sencillos",30],["Vale casero: una cena cocinada por ti",0],
-  ["Mini proyector de estrellas",20],["Cuaderno bonito y un boli de los buenos",12]
+  ["Botella térmica de acero",15],["Funko de su serie favorita",15],["Lámpara de luna o de nubes",17],
+  ["Camiseta con una frase mítica del grupo",18],["Batería externa para el móvil",18],
+  ["Puzzle de 500 piezas con una foto vuestra",20],["Manta de sofá gordita",20],["Mini proyector de estrellas",20],
+  ["Altavoz bluetooth pequeño",22],["Kit para hacer cócteles en casa",25],["Juego de mesa (Código Secreto, Exploding Kittens)",25],
+  ["Sudadera de su equipo favorito",30],["Escape room para dos",40],["Vale casero: una cena cocinada por ti",0]
 ];
 
 // ================== Utilidades ==================
@@ -254,268 +239,225 @@ const rnd = n => { const a=new Uint32Array(1); crypto.getRandomValues(a); return
 const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]} return a };
 const store = {
   get(k){ try{ return JSON.parse(localStorage.getItem(k)) }catch{ return null } },
-  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch{} }
+  set(k,v){ try{ v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v)) }catch{} }
 };
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 const code = name => { let h=7; for(const c of name) h=(h*31+c.charCodeAt(0))>>>0; return "AG-"+String(h%900+100) };
+const fmtDate = iso => { const d=new Date(iso+"T12:00:00"); return isNaN(d)?(iso||""):d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}) };
+const daysTo = iso => { const d=new Date(iso+"T00:00:00"); if(isNaN(d)) return null; const t=new Date(); t.setHours(0,0,0,0); return Math.round((d-t)/864e5) };
+const safeUrl = u => { u=String(u||"").trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u;
+  try{ const x=new URL(u); return /^https?:$/.test(x.protocol)&&x.hostname.includes(".") ? x.href : "" }catch{ return "" } };
+const host = u => { try{ return new URL(u).hostname.replace(/^www\./,"") }catch{ return "" } };
+const b64 = buf => { const b=new Uint8Array(buf); let s=""; for(let i=0;i<b.length;i+=0x8000) s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000)); return btoa(s) };
+const unb64 = s => Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let timer=null;
+const stopTimers = () => { clearInterval(timer); timer=null; clearInterval(window.__cd) };
 
-// Ofuscación del enlace (para no hacer trampas sin querer; no es criptografía)
-const SALT = new TextEncoder().encode("casarabonela-regalo-2026");
-function encode(o){
-  const b = new TextEncoder().encode(JSON.stringify(o)).map((x,i)=>x ^ SALT[i%SALT.length] ^ (i*31&255));
-  let s=""; b.forEach(x=>s+=String.fromCharCode(x));
-  return "r"+btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+async function api(path, body, admin){
+  const h={}; if(body) h["content-type"]="application/json"; if(admin) h.authorization="Bearer "+admin;
+  let r;
+  try{ r=await fetch(API+path,{method:body?"POST":"GET",headers:h,body:body?JSON.stringify(body):undefined}) }
+  catch{ throw new Error("No hay conexión con la central. Revisa tu internet y vuelve a probar.") }
+  let j={}; try{ j=await r.json() }catch{}
+  if(!r.ok){ const e=new Error(j.error||"Algo ha fallado ("+r.status+")."); e.status=r.status; throw e }
+  return j;
 }
-function decode(t){
-  try{
-    if(!t||t[0]!=="r") return null;
-    let s=t.slice(1).replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="=";
-    const bin=atob(s), b=new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i) ^ SALT[i%SALT.length] ^ (i*31&255);
-    const o=JSON.parse(new TextDecoder().decode(b));
-    return o&&o.g&&o.r ? o : null;
-  }catch{ return null }
+
+// ================== Cifrado (solo tú puedes leer tu resultado) ==================
+async function pinKey(pin, salt){
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(pin),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:250000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+async function makeKeys(pin){
+  const kp=await crypto.subtle.generateKey({name:"RSA-OAEP",modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:"SHA-256"},true,["encrypt","decrypt"]);
+  const pub=b64(await crypto.subtle.exportKey("spki",kp.publicKey));
+  const priv=await crypto.subtle.exportKey("pkcs8",kp.privateKey);
+  const salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},await pinKey(pin,salt),priv);
+  return {pub, wrapped:JSON.stringify({s:b64(salt),iv:b64(iv),ct:b64(ct)})};
+}
+async function openAssignment(wrapped, pin, ct){
+  const w=JSON.parse(wrapped);
+  const pkcs8=await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64(w.iv)},await pinKey(pin,unb64(w.s)),unb64(w.ct));
+  const key=await crypto.subtle.importKey("pkcs8",pkcs8,{name:"RSA-OAEP",hash:"SHA-256"},false,["decrypt"]);
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:"RSA-OAEP"},key,unb64(ct))));
 }
 
-// Sorteo: nadie se toca a sí mismo y se respetan las parejas vetadas
-function draw(people, excl){
-  const ban=new Set(); excl.forEach(([a,b])=>{ban.add(a+"|"+b);ban.add(b+"|"+a)});
-  for(let t=0;t<5000;t++){
-    const r=shuffle(people);
-    if(people.every((g,i)=>g!==r[i]&&!ban.has(g+"|"+r[i]))) return people.map((g,i)=>[g,r[i]]);
-  }
-  return null;
+// ================== Inicio: tablero de agentes ==================
+let G=null; // estado público
+async function loadState(){ G=await api("/api/state"); return G }
+
+function agentsBoard(){
+  return `<div class="agents">${G.people.map(p=>{
+    const st = !p.joined ? "Sin registrar" : p.items ? `Carta: ${p.items} ${p.items===1?"deseo":"deseos"}` : "Registrado, sin carta";
+    const ok = p.joined && p.items;
+    return `<button class="agent ${ok?"done":"wait"}" type="button" data-agent="${esc(p.name)}">
+      <span class="seal">${ok?"Lista":"Pendiente"}</span>
+      <span class="st">${esc(code(p.name))}</span><span class="nm">${esc(p.name)}</span><span class="st">${st}</span></button>`}).join("")}</div>`;
 }
-const fmtDate = iso => { const d=new Date(iso+"T12:00:00"); return isNaN(d)?iso:d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) };
-const msgFor = (g,url,ev) => `🕵️ ${ev}\nAgente ${g}: tienes un expediente clasificado.\nÁbrelo tú solo, sin nadie mirando:\n${url}`;
 
-// ================== Estado de la central ==================
-let S = store.get(KEY) || {...DEFAULT, people:[...DEFAULT.people], excl:[], links:null, sent:{}, order:null};
-const save = () => store.set(KEY,S);
-
-// ================== Central de operaciones ==================
-function renderHQ(){
-  const done=!!S.links;
-  const isFile = location.protocol==="file:";
-  $("#app").innerHTML = `
-  <div class="strip"><span>Alto secreto</span><span>Central de operaciones</span><span>${new Date().getFullYear()}</span></div>
+async function renderHome(){
+  stopTimers();
+  try{ await loadState() }catch(e){ return renderError(e.message, renderHome) }
+  const n=G.people.length, ready=G.people.filter(p=>p.joined&&p.items).length, joined=G.people.filter(p=>p.joined).length;
+  const d=daysTo(G.cfg.date);
+  const admin=store.get(ADMIN_KEY);
+  $("#app").innerHTML=`
+  <div class="strip"><span>Alto secreto</span><span>${esc(G.cfg.event)}</span><span>${d!=null&&d>=0?`Día D −${d}`:""}</span></div>
   <header class="hero">
     <span class="label">Operación</span>
     <h1>Amigo<em>Invisible</em></h1>
-    <p>Configura la operación, haz el sorteo y manda a cada agente su expediente. Ni la central sabe quién le toca a quién: solo salen los enlaces.</p>
+    <p>${G.drawn
+      ? "El sorteo ya está hecho. Entra con tu nombre y tu PIN para abrir tu expediente y ver a quién le haces el regalo, con su carta de deseos."
+      : "Elige tu nombre, ponte un PIN y escribe tu carta: lo que te gustaría recibir, con enlaces y fotos. Cuando estéis todos, la central hace el sorteo."}</p>
   </header>
-  ${isFile?`<p class="msg">Estás abriendo el archivo desde tu PC. Haz el sorteo desde la web publicada para que los enlaces funcionen en los móviles.</p>`:""}
-
-  <section class="panel" aria-labelledby="h-op">
-    <div class="head"><h2 id="h-op">La operación</h2><span class="label">Paso 1</span></div>
-    <div class="grid">
-      <div class="field"><label for="ev">Nombre en clave</label><input class="inp" id="ev" value="${esc(S.event)}" ${done?"disabled":""}></div>
-      <div class="field"><label for="bu">Presupuesto máximo (€)</label><input class="inp" id="bu" inputmode="decimal" value="${esc(S.budget)}" ${done?"disabled":""}></div>
-      <div class="field"><label for="da">Día del intercambio</label><input class="inp" id="da" type="date" value="${esc(S.date)}" ${done?"disabled":""}></div>
-    </div>
-    <label class="switch" for="mi">
-      <input type="checkbox" id="mi" ${S.missions?"checked":""} ${done?"disabled":""}>
-      <span><b>Misiones secretas</b><small>Cada agente recibe un reto para su regalo (envolverlo con periódico, que lleve algo rojo…). El día del intercambio se descubre si lo cumplió.</small></span>
-    </label>
-  </section>
-
+  <div class="phase">
+    <b>${G.drawn?"Fase 2":"Fase 1"}</b>
+    <span>${G.drawn
+      ? `Sorteo hecho. Presupuesto máximo <b>${esc(G.cfg.budget)} €</b>. Intercambio el ${esc(fmtDate(G.cfg.date))}.`
+      : `Apuntaos y escribid vuestra carta. ${ready} de ${n} cartas listas. Presupuesto máximo <b>${esc(G.cfg.budget)} €</b>.`}</span>
+  </div>
   <section class="panel" aria-labelledby="h-ag">
-    <div class="head"><h2 id="h-ag">Agentes</h2><span class="label">${S.people.length} reclutados</span></div>
-    <div class="chips">${S.people.map((p,i)=>`<span class="chip"><span class="code">${code(p)}</span>${esc(p)}${done?"":`<button type="button" aria-label="Quitar a ${esc(p)}" data-del="${i}">✕</button>`}</span>`).join("")}</div>
-    ${done?"":`
-    <form class="row" id="addf">
-      <input class="inp" id="newp" placeholder="Reclutar a alguien más" autocomplete="off" aria-label="Nombre del nuevo agente">
-      <button class="btn" type="submit">Reclutar</button>
+    <div class="head"><h2 id="h-ag">¿Quién eres?</h2><span class="label">${joined} de ${n} registrados</span></div>
+    <div class="progress" aria-hidden="true"><span style="width:${n?ready/n*100:0}%"></span></div>
+    ${agentsBoard()}
+  </section>
+  ${admin?`<div class="row"><button class="btn" id="toAdmin">Panel de la central</button></div>`:""}
+  <p class="foot">Shhh · Casarabonela</p>`;
+  $$("[data-agent]").forEach(b=>b.onclick=()=>{ const p=G.people.find(x=>x.name===b.dataset.agent); p.joined?renderLogin(p.name):renderRegister(p.name) });
+  const ta=$("#toAdmin"); if(ta) ta.onclick=renderAdmin;
+  timer=setInterval(async()=>{ try{ const old=JSON.stringify(G); await loadState(); if(JSON.stringify(G)!==old) renderHome() }catch{} },20000);
+}
+
+function renderError(msg, retry){
+  stopTimers();
+  $("#app").innerHTML=`<div class="strip"><span>Error</span><span>Sin contacto</span><span>—</span></div>
+  <section class="center" style="padding-block:30px"><h1 style="font-size:56px">Sin<br><span style="color:var(--lamp)">señal</span></h1>
+  <p class="note" style="max-width:44ch">${esc(msg)}</p><button class="btn" id="retry">Reintentar</button></section>`;
+  $("#retry").onclick=retry;
+}
+
+// ================== Registro y entrada ==================
+function pinScreen({title, sub, fields, button, onSubmit}){
+  stopTimers();
+  $("#app").innerHTML=`
+  <div class="strip"><span>Control de acceso</span><span>${esc(G?G.cfg.event:"")}</span><span>—</span></div>
+  <section class="center">
+    <span class="label">Agente</span>
+    <h1 style="font-size:clamp(46px,12vw,96px)">${title}</h1>
+    <p class="note" style="max-width:44ch">${sub}</p>
+    <form class="pinbox" id="pf" autocomplete="off">
+      ${fields.map(f=>`<div class="field"><label for="${f.id}">${f.label}</label>
+        <input class="inp pin" id="${f.id}" type="password" inputmode="numeric" pattern="[0-9]*" minlength="4" maxlength="6" autocomplete="off" required></div>`).join("")}
+      <button class="btn big" type="submit" id="pbtn">${button}</button>
+      <span class="msg" id="pmsg" role="status"></span>
     </form>
-    <details ${S.excl.length?"open":""}>
-      <summary>Parejas que no pueden tocarse (opcional)</summary>
-      <div class="chips">${S.excl.map(([a,b],i)=>`<span class="chip">${esc(a)} ⇄ ${esc(b)}<button type="button" aria-label="Quitar pareja" data-dx="${i}">✕</button></span>`).join("")||`<p class="note">Ninguna. Sirve para parejas o hermanos que ya se regalan.</p>`}</div>
-      <div class="row" style="margin-top:10px">
-        <select class="inp" id="xa" aria-label="Agente A">${S.people.map(p=>`<option>${esc(p)}</option>`).join("")}</select>
-        <span>⇄</span>
-        <select class="inp" id="xb" aria-label="Agente B">${S.people.map((p,i)=>`<option ${i===1?"selected":""}>${esc(p)}</option>`).join("")}</select>
-        <button class="btn sm" type="button" id="xadd">Añadir</button>
-      </div>
-    </details>`}
-  </section>
-
-  ${done?renderFiles():`
-  <section class="panel">
-    <div class="shuffle" id="shuf" aria-hidden="true" hidden></div>
-    <div class="row">
-      <button class="btn big" id="go">Ejecutar sorteo</button>
-      <span class="msg" id="msg" role="status"></span>
-    </div>
-    <p class="note">En pantalla no aparece ningún resultado. Solo los expedientes cerrados de cada uno.</p>
-  </section>`}
-
-  ${done?renderDayD():""}
-  <p class="foot">Este mensaje no se autodestruirá · Casarabonela</p>`;
-  bindHQ();
-}
-
-function renderFiles(){
-  const n=S.people.length, sent=Object.keys(S.sent||{}).length;
-  return `
-  <section class="panel" aria-labelledby="h-fi">
-    <div class="head"><h2 id="h-fi">Expedientes</h2><span class="label">Entregados ${sent} de ${n}</span></div>
-    <div class="progress" aria-hidden="true"><span style="width:${n?sent/n*100:0}%"></span></div>
-    <p class="note">Manda a cada agente <b>solo su expediente</b>. El tuyo ábrelo cuando quieras; los de los demás, ni tocarlos.</p>
-    <div class="files">
-      ${S.links.map(({g,tok})=>{
-        const url=BASE+"#"+tok;
-        return `<article class="folder" data-tab="${code(g)}">
-          ${S.sent[g]?`<span class="sent">Entregado</span>`:""}
-          <span class="lbl">Para el agente</span>
-          <span class="who">${esc(g)}</span>
-          <div class="url">${esc(url)}</div>
-          <div class="btns">
-            <a class="btn sm wa" href="https://wa.me/?text=${encodeURIComponent(msgFor(g,url,S.event))}" target="_blank" rel="noopener" data-wa="${esc(g)}">WhatsApp</a>
-            <button class="btn sm" type="button" data-copy="${esc(g)}">Copiar</button>
-          </div>
-        </article>`}).join("")}
-    </div>
-    <div class="row">
-      <button class="btn sm" type="button" id="redo">Repetir el sorteo</button>
-    </div>
-    <div class="row" id="confirm" hidden>
-      <span>Los expedientes ya enviados dejarán de valer. ¿Seguro?</span>
-      <button class="btn sm" type="button" id="yes" style="background:var(--stamp);border-color:transparent;color:#fff">Sí, repetir</button>
-      <button class="btn sm" type="button" id="no">Cancelar</button>
-    </div>
+    <button class="linkbtn note" type="button" id="back">← No soy yo, volver</button>
   </section>`;
-}
-
-function renderDayD(){
-  return `
-  <section class="panel" aria-labelledby="h-dd">
-    <div class="head"><h2 id="h-dd">Día D</h2><span class="label">${esc(fmtDate(S.date))}</span></div>
-    <ol class="rules">
-      <li>Sale el agente que toque. Da <b>tres pistas</b> sobre su objetivo, de más difícil a más fácil, sin decir el nombre.</li>
-      <li>El resto intenta adivinar. Quien acierte primero elige quién sale después… o sigue el orden.</li>
-      <li>Entrega el regalo. Si había misión secreta, el grupo vota si la cumplió.</li>
-    </ol>
-    ${S.order?`<ol class="order">${S.order.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>`:""}
-    <div class="row"><button class="btn" type="button" id="order">${S.order?"Sortear otro orden":"Sortear el orden de salida"}</button></div>
-  </section>`;
-}
-
-function bindHQ(){
-  const sync=()=>{ const ev=$("#ev"); if(!ev||ev.disabled) return;
-    S.event=ev.value.trim()||DEFAULT.event; S.budget=$("#bu").value.trim(); S.date=$("#da").value; S.missions=$("#mi").checked; save() };
-  ["#ev","#bu","#da","#mi"].forEach(id=>{ const el=$(id); el&&el.addEventListener("input",sync); el&&el.addEventListener("change",sync) });
-  $$("[data-del]").forEach(b=>b.onclick=()=>{ const n=S.people[+b.dataset.del]; S.people.splice(+b.dataset.del,1);
-    S.excl=S.excl.filter(([a,c])=>a!==n&&c!==n); save(); renderHQ() });
-  $$("[data-dx]").forEach(b=>b.onclick=()=>{ S.excl.splice(+b.dataset.dx,1); save(); renderHQ() });
-  const f=$("#addf"); if(f) f.onsubmit=e=>{ e.preventDefault(); const v=$("#newp").value.trim(); if(!v) return;
-    if(!S.people.some(p=>p.toLowerCase()===v.toLowerCase())) S.people.push(v); save(); renderHQ(); $("#newp").focus() };
-  const xa=$("#xadd"); if(xa) xa.onclick=()=>{ const a=$("#xa").value,b=$("#xb").value;
-    if(a!==b&&!S.excl.some(([x,y])=>(x===a&&y===b)||(x===b&&y===a))){ S.excl.push([a,b]); save(); renderHQ() } };
-  const go=$("#go"); if(go) go.onclick=()=>{
-    sync();
-    if(S.people.length<3) return $("#msg").textContent="Hacen falta al menos 3 agentes.";
-    const pairs=draw(S.people,S.excl);
-    if(!pairs) return $("#msg").textContent="Con esas parejas vetadas no sale ningún reparto. Quita alguna.";
-    const ms=shuffle(MISSIONS);
-    S.links=pairs.map(([g,r],i)=>{
-      let m=null;
-      if(S.missions) m = (i===0 && rnd(2)) ? INITIAL_MISSION.replace("%L",r[0].toUpperCase()) : ms[i%ms.length];
-      return {g, tok:encode({g,r,e:S.event,b:S.budget,d:S.date,m})};
-    });
-    S.sent={}; S.order=null; save();
-    go.disabled=true;
-    const box=$("#shuf"), names=S.people; let k=0; box.hidden=false;
-    if(reduced()){ renderHQ(); return }
-    const iv=setInterval(()=>{ box.textContent="Cifrando · "+names[k++%names.length] },70);
-    setTimeout(()=>{ clearInterval(iv); renderHQ(); shreds(1400) },1300);
+  $("#back").onclick=renderHome;
+  $("#"+fields[0].id).focus();
+  $("#pf").onsubmit=async e=>{
+    e.preventDefault();
+    const vals=fields.map(f=>$("#"+f.id).value.trim());
+    if(vals.some(v=>!/^\d{4,6}$/.test(v))) return $("#pmsg").textContent="El PIN son de 4 a 6 números.";
+    const b=$("#pbtn"); b.disabled=true; $("#pmsg").className="msg"; $("#pmsg").textContent="Un momento…";
+    try{ await onSubmit(vals) }catch(err){ $("#pmsg").textContent=err.message; b.disabled=false }
   };
-  $$("[data-copy]").forEach(b=>b.onclick=()=>{
-    const g=b.dataset.copy, l=S.links.find(x=>x.g===g), text=msgFor(g,BASE+"#"+l.tok,S.event);
-    const ok=()=>{ b.textContent="¡Copiado!"; S.sent[g]=1; save(); setTimeout(renderHQ,900) };
-    const fail=()=>{ const u=b.closest(".folder").querySelector(".url"), r=document.createRange(); r.selectNodeContents(u);
-      const s=getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent="Cópialo a mano" };
-    try{ navigator.clipboard.writeText(text).then(ok,fail) }catch{ fail() }
+}
+
+function renderRegister(name){
+  if(G.drawn) return renderError("El sorteo ya se hizo y no estabas registrado. Habla con el organizador.", renderHome);
+  pinScreen({
+    title:`Hola,<br><span style="color:var(--lamp)">${esc(name)}</span>`,
+    sub:"Crea tu PIN secreto. Lo necesitarás para editar tu carta y para ver a quién te toca. <b>Apúntalo</b>: si lo olvidas después del sorteo no se puede recuperar.",
+    fields:[{id:"p1",label:"Tu PIN (4 a 6 números)"},{id:"p2",label:"Repite el PIN"}],
+    button:"Crear mi PIN",
+    onSubmit: async([a,b])=>{
+      if(a!==b) throw new Error("Los dos PIN no coinciden.");
+      $("#pmsg").textContent="Generando tus claves secretas…";
+      const k=await makeKeys(a);
+      await api("/api/claim",{name,pin:a,pub:k.pub,wrapped:k.wrapped});
+      await enterAgent(name,a);
+    }
   });
-  $$("[data-wa]").forEach(a=>a.addEventListener("click",()=>{ S.sent[a.dataset.wa]=1; save(); setTimeout(renderHQ,500) }));
-  const redo=$("#redo"); if(redo) redo.onclick=()=>$("#confirm").hidden=false;
-  const no=$("#no"); if(no) no.onclick=()=>$("#confirm").hidden=true;
-  const yes=$("#yes"); if(yes) yes.onclick=()=>{ S.links=null; S.sent={}; S.order=null; save(); renderHQ() };
-  const ord=$("#order"); if(ord) ord.onclick=()=>{ S.order=shuffle(S.people); save(); renderHQ(); $("#h-dd").scrollIntoView({behavior:reduced()?"auto":"smooth"}) };
+}
+function renderLogin(name){
+  pinScreen({
+    title:`Agente<br><span style="color:var(--lamp)">${esc(name)}</span>`,
+    sub:"Introduce tu PIN para entrar.",
+    fields:[{id:"p1",label:"Tu PIN"}], button:"Entrar",
+    onSubmit: async([a])=>enterAgent(name,a)
+  });
 }
 
-// ================== Vista del agente ==================
-const FP_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-<path d="M12 11c0 3.5-1 6.5-3 9"/><path d="M8.5 4.8A7.5 7.5 0 0 1 19.5 11c0 1.6-.2 3.2-.6 4.7"/><path d="M4.5 8.5A7.5 7.5 0 0 1 6 6.3"/>
-<path d="M4.5 12c0 2-.4 3.8-1.1 5.3"/><path d="M15.5 11c0 2.6-.5 5.1-1.5 7.4"/><path d="M8.5 11a3.5 3.5 0 0 1 7 0"/><path d="M8.5 11c0 2.2-.6 4.3-1.7 6.1"/><path d="M18.2 18.6c.3-.8.6-1.6.8-2.5"/></svg>`;
+// ================== Zona del agente ==================
+let ME=null; // {name,pin,data}
+async function enterAgent(name,pin,tab){
+  const data=await api("/api/login",{name,pin});
+  ME={name,pin,data}; store.set(ME_KEY,{name,pin});
+  renderAgent(tab || (data.drawn?"obj":"carta"));
+}
+function logout(){ store.set(ME_KEY,null); ME=null; renderHome() }
 
-function renderGate(o){
-  $("#app").innerHTML = `
-  <div class="strip"><span>Alto secreto</span><span>Solo para ${esc(o.g)}</span><span>${esc(code(o.g))}</span></div>
-  <section class="gate">
-    <span class="label">${esc(o.e||"Amigo Invisible")}</span>
-    <h1>Agente<br><em>${esc(o.g)}</em></h1>
-    <p>Tienes un expediente clasificado. Comprueba que nadie mira la pantalla y verifica tu identidad.</p>
-    <button class="finger" id="fp" aria-label="Mantén pulsado para verificar tu identidad">${FP_SVG}</button>
-    <span class="finger-hint" id="fph">Mantén el dedo encima</span>
-  </section>`;
-  const fp=$("#fp"), hint=$("#fph"); let t0=0, raf=0, held=false;
-  const NEED = reduced()?300:1400;
-  const tick=t=>{ if(!held) return; const p=Math.min(1,(t-t0)/NEED); fp.style.setProperty("--p",p);
-    if(p>=1){ held=false; hint.textContent="Identidad verificada"; navigator.vibrate&&navigator.vibrate(60); setTimeout(()=>renderDossier(o),250); return }
-    raf=requestAnimationFrame(tick) };
-  const start=e=>{ e.preventDefault(); if(held) return; held=true; t0=performance.now(); fp.classList.add("scan"); hint.textContent="Escaneando…"; raf=requestAnimationFrame(tick) };
-  const stop=()=>{ if(!held) return; held=false; cancelAnimationFrame(raf); fp.classList.remove("scan"); fp.style.setProperty("--p",0); hint.textContent="Sin soltar, hasta que se llene" };
-  fp.addEventListener("pointerdown",start); ["pointerup","pointerleave","pointercancel"].forEach(ev=>fp.addEventListener(ev,stop));
-  fp.addEventListener("keydown",e=>{ if((e.key===" "||e.key==="Enter")&&!e.repeat) start(e) });
-  fp.addEventListener("keyup",e=>{ if(e.key===" "||e.key==="Enter") stop() });
-  fp.addEventListener("contextmenu",e=>e.preventDefault());
+function renderAgent(tab){
+  stopTimers();
+  const d=ME.data;
+  $("#app").innerHTML=`
+  <div class="strip"><span>Alto secreto</span><span>Agente ${esc(ME.name)}</span><span>${esc(code(ME.name))}</span></div>
+  <header class="head">
+    <div style="display:grid;gap:6px"><span class="label">${esc(d.cfg.event)}</span><h1 style="font-size:clamp(40px,10vw,72px)">Agente <span style="color:var(--lamp)">${esc(ME.name)}</span></h1></div>
+    <button class="btn sm ghost" id="out">Salir</button>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-carta" aria-selected="${tab==="carta"}">Mi carta</button>
+    <button class="tab" role="tab" id="t-obj" aria-selected="${tab==="obj"}">Mi objetivo</button>
+  </nav>
+  <div id="pane" style="display:grid;gap:26px"></div>
+  <p class="foot">Shhh · No se lo digas a nadie</p>`;
+  $("#out").onclick=logout;
+  $("#t-carta").onclick=()=>renderAgent("carta");
+  $("#t-obj").onclick=()=>renderAgent("obj");
+  tab==="carta" ? paneCarta() : paneObjetivo();
 }
 
-function renderDossier(o){
-  const num = code(o.g).slice(3)+"-"+String(o.r.length*7+11).padStart(3,"0");
-  const wishKey="ficha-"+o.g, wish=store.get(wishKey)||{};
-  const budget=parseFloat(String(o.b).replace(",","."))||null;
-  $("#app").innerHTML = `
-  <div class="strip"><span>Alto secreto</span><span>Expediente abierto</span><span>${esc(code(o.g))}</span></div>
-  <article class="dossier" data-num="${esc(num)}" style="margin-top:30px">
-    <div class="top">
-      <dl class="kv">
-        <dt>Agente</dt><dd>${esc(o.g)}</dd>
-        <dt>Operación</dt><dd>${esc(o.e||"Amigo Invisible")}</dd>
-        ${o.b?`<dt>Fondos</dt><dd>máximo ${esc(o.b)} €</dd>`:""}
-        ${o.d?`<dt>Día D</dt><dd>${esc(fmtDate(o.d))}</dd>`:""}
-      </dl>
-      <span class="stamp">Confidencial</span>
-    </div>
-    <div class="target">
-      <span class="label" style="color:inherit;opacity:.7">Objetivo asignado</span>
-      <div class="scratch" id="sc">
-        <span class="name">${esc(o.r)}</span>
-        <canvas id="scc" aria-hidden="true"></canvas>
-        <span class="assigned" id="as">Asignado</span>
+// ---------- Mi carta ----------
+function itemCard(x,i,edit){
+  return `<article class="wi">
+    <div class="ph">${x.i?`<img src="${esc(x.i)}" alt="${esc(x.t)}" loading="lazy">`:""}<span>${esc((x.t||"?")[0].toUpperCase())}</span></div>
+    <div class="bd">
+      <span class="t"><span class="n">${i+1}</span>${esc(x.t)}</span>
+      <div class="meta">${x.p?`<span class="pr">~${esc(x.p)} €</span>`:""}${x.u?`<span>${esc(host(x.u))}</span>`:""}</div>
+      ${x.n?`<p class="note">${esc(x.n)}</p>`:""}
+      <div class="acts">
+        ${x.u?`<a class="btn sm" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer">Ver en la tienda</a>`:""}
+        ${edit?`<button class="btn sm" type="button" data-up="${i}" ${i?"":"disabled"} aria-label="Subir prioridad">▲</button>
+          <button class="btn sm" type="button" data-ed="${i}">Editar</button>
+          <button class="btn sm" type="button" data-rm="${i}">Quitar</button>`:""}
       </div>
-      <div class="scratch-tip"><span id="tip">Rasca la franja tachada con el dedo</span><button class="linkbtn" type="button" id="skip">Revelar sin rascar</button></div>
-    </div>
-    <div id="post" hidden style="display:grid;gap:22px">
-      ${o.m?`<div class="mission"><b>Misión secreta</b><p>${esc(o.m)}</p><span class="note" style="color:inherit;opacity:.7">El día del intercambio el grupo votará si la has cumplido.</span></div>`:""}
-      ${o.d?`<div style="display:grid;gap:8px"><span class="label" style="color:inherit;opacity:.7">Cuenta atrás para el Día D</span><div class="count" id="cd"></div></div>`:""}
-      <button class="btn sm self-destruct" type="button" id="hide">Tapar el expediente</button>
-    </div>
-  </article>
+    </div></article>`;
+}
+const fixImgs = root => $$(".ph img",root).forEach(im=>{ const f=()=>im.remove(); if(im.complete&&!im.naturalWidth) f(); else im.addEventListener("error",f) });
 
-  <section class="panel extra" id="extras" hidden aria-labelledby="h-id">
-    <div class="head"><h2 id="h-id">Material de apoyo</h2><span class="label">${budget!=null?"hasta "+esc(o.b)+" €":"ideas"}</span></div>
-    <p class="note">¿Sin ideas para ${esc(o.r)}? Aquí tienes unas cuantas dentro del presupuesto. Precios aproximados.</p>
-    <div class="ideas" id="ideas"></div>
-    <div class="row"><button class="btn sm" type="button" id="more">Otras ideas</button></div>
-  </section>
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image(); await new Promise((ok,ko)=>{ img.onload=ok; img.onerror=ko; img.src=url });
+    const k=Math.min(1,360/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement("canvas"); c.width=Math.max(1,Math.round(img.naturalWidth*k)); c.height=Math.max(1,Math.round(img.naturalHeight*k));
+    const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height);
+    let d=c.toDataURL("image/webp",.6); if(!d.startsWith("data:image/webp")) d=c.toDataURL("image/jpeg",.65);
+    return d;
+  } finally { URL.revokeObjectURL(url) }
+}
 
-  <section class="panel extra" id="carta" hidden aria-labelledby="h-fc">
-    <div class="head"><h2 id="h-fc">Mi carta de deseos</h2><span class="label">Para tu agente</span></div>
-    <p class="note">Alguien te está buscando regalo y no sabes quién. Apunta lo que te gustaría recibir, con enlace y foto si quieres, y manda la carta al grupo: tu agente la verá sin delatarse. Lo que más ilusión te haga, arriba del todo.</p>
-
+function paneCarta(){
+  const C=ME.data.carta||{f:{},it:[]}; C.f=C.f||{}; C.it=C.it||[];
+  $("#pane").innerHTML=`
+  <section class="panel" aria-labelledby="h-c">
+    <div class="head"><h2 id="h-c">Mi carta de deseos</h2><span class="save" id="sv">${C.it.length?"Guardada ✓":"Vacía"}</span></div>
+    <p class="note">Lo que te gustaría recibir. Tu amigo invisible la verá cuando se haga el sorteo, sin que tú sepas quién es. Lo que más ilusión te haga, arriba del todo. Se guarda sola.</p>
+    ${ME.data.drawn?`<p class="msg good">El sorteo ya está hecho. Si cambias algo, tu amigo invisible verá la versión nueva.</p>`:""}
     <div class="wl" id="wl"></div>
-
     <form class="wform" id="wf" autocomplete="off">
       <span class="label" id="wfh">Añadir un deseo</span>
       <div class="grid">
@@ -537,238 +479,305 @@ function renderDossier(o){
         <span class="msg" id="wmsg" role="status"></span>
       </div>
     </form>
-
-    <details>
-      <summary>Más pistas para tu agente</summary>
+    <details ${Object.values(C.f).some(Boolean)?"open":""}>
+      <summary>Más pistas para tu amigo invisible</summary>
       <div class="grid">
         <div class="field"><label for="w1">Me flipa…</label><textarea class="inp" id="w1"></textarea></div>
         <div class="field"><label for="w2">Me haría ilusión algo de…</label><textarea class="inp" id="w2"></textarea></div>
         <div class="field"><label for="w3">Ni se te ocurra regalarme…</label><textarea class="inp" id="w3"></textarea></div>
-        <div class="field"><label for="w4">Talla (por si es ropa)</label><input class="inp" id="w4"></div>
+        <div class="field"><label for="w4">Talla (por si es ropa)</label><input class="inp" id="w4" maxlength="30"></div>
       </div>
     </details>
+  </section>`;
 
-    <div class="row">
-      <a class="btn wa" id="wsend" href="#" target="_blank" rel="noopener">Enviar mi carta al grupo</a>
-      <button class="btn sm" type="button" id="wcopy">Copiar enlace</button>
-      <a class="btn sm" id="wview" href="#" target="_blank" rel="noopener">Ver cómo queda</a>
+  let editing=-1, img="", saveT=null, saving=Promise.resolve();
+  const sv=$("#sv");
+  const persist=()=>{ ME.data.carta=C; sv.className="save"; sv.textContent="Guardando…"; clearTimeout(saveT);
+    saveT=setTimeout(()=>{ saving=saving.then(async()=>{
+      try{ await api("/api/carta",{name:ME.name,pin:ME.pin,carta:C}); if(sv.isConnected){ sv.className="save ok"; sv.textContent="Guardada ✓" } }
+      catch(e){ if(sv.isConnected){ sv.className="save bad"; sv.textContent=e.message } }
+    }) },700) };
+  ["w1","w2","w3","w4"].forEach(k=>{ const el=$("#"+k); el.value=C.f[k]||""; el.addEventListener("input",()=>{ C.f[k]=el.value; persist() }) });
+
+  const draw=()=>{
+    const wl=$("#wl");
+    wl.innerHTML=C.it.length?C.it.map((x,i)=>itemCard(x,i,true)).join("")
+      :`<div class="wempty"><b>Tu carta está vacía</b><span>Añade abajo lo primero que te gustaría recibir. Si pegas el enlace de la tienda, tu amigo invisible podrá ir directo.</span></div>`;
+    fixImgs(wl);
+    $$("[data-rm]",wl).forEach(b=>b.onclick=()=>{ C.it.splice(+b.dataset.rm,1); if(editing>=0) resetForm(); persist(); draw() });
+    $$("[data-up]",wl).forEach(b=>b.onclick=()=>{ const i=+b.dataset.up; [C.it[i-1],C.it[i]]=[C.it[i],C.it[i-1]]; persist(); draw() });
+    $$("[data-ed]",wl).forEach(b=>b.onclick=()=>{ const i=+b.dataset.ed, x=C.it[i]; editing=i;
+      $("#wt").value=x.t; $("#wu").value=x.u||""; $("#wp").value=x.p||""; $("#wn").value=x.n||""; setImg(x.i);
+      $("#wiu").value=x.i&&!x.i.startsWith("data:")?x.i:"";
+      $("#wfh").textContent="Editando el deseo "+(i+1); $("#wsave").textContent="Guardar cambios"; $("#wcancel").hidden=false;
+      $("#wf").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"}); $("#wt").focus() });
+  };
+  const setImg=v=>{ img=v||""; const th=$("#wthumb"); th.hidden=!img; if(img) th.src=img; else th.removeAttribute("src"); $("#wclr").hidden=!img };
+  const resetForm=()=>{ editing=-1; $("#wf").reset(); setImg(""); $("#wfh").textContent="Añadir un deseo"; $("#wsave").textContent="Añadir a mi carta"; $("#wcancel").hidden=true };
+  $("#wthumb").addEventListener("error",()=>{ if(img&&!img.startsWith("data:")){ $("#wmsg").textContent="Esa imagen no se puede cargar. Prueba con otra o súbela."; setImg("") } });
+  $("#wpick").onclick=()=>$("#wfile").click();
+  $("#wfile").onchange=async e=>{ const f=e.target.files[0]; if(!f) return; $("#wmsg").textContent="Preparando foto…";
+    try{ setImg(await shrink(f)); $("#wiu").value=""; $("#wmsg").textContent="" }catch{ $("#wmsg").textContent="No se pudo leer esa foto. Prueba con otra." }
+    e.target.value="" };
+  $("#wiu").addEventListener("input",e=>{ const u=safeUrl(e.target.value); if(u||!e.target.value){ $("#wmsg").textContent=""; setImg(u) } });
+  $("#wclr").onclick=()=>{ setImg(""); $("#wiu").value="" };
+  $("#wcancel").onclick=()=>{ resetForm(); $("#wmsg").textContent="" };
+  $("#wf").onsubmit=e=>{
+    e.preventDefault(); const m=$("#wmsg"); m.className="msg";
+    const t=$("#wt").value.trim(); if(!t){ m.textContent="Pon al menos qué es."; $("#wt").focus(); return }
+    const raw=$("#wu").value.trim(), u=safeUrl(raw);
+    if(raw&&!u){ m.textContent="Ese enlace no parece una web. Cópialo entero desde la tienda."; $("#wu").focus(); return }
+    if(editing<0&&C.it.length>=20){ m.textContent="Máximo 20 deseos."; return }
+    const x={t,u,p:$("#wp").value.trim().replace(/[^\d.,]/g,""),n:$("#wn").value.trim(),i:img};
+    if(editing>=0) C.it[editing]=x; else C.it.push(x);
+    resetForm(); persist(); draw(); m.className="msg good"; m.textContent="Añadido.";
+  };
+  draw();
+}
+
+// ---------- Mi objetivo ----------
+const FP_SVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+<path d="M12 11c0 3.5-1 6.5-3 9"/><path d="M8.5 4.8A7.5 7.5 0 0 1 19.5 11c0 1.6-.2 3.2-.6 4.7"/><path d="M4.5 8.5A7.5 7.5 0 0 1 6 6.3"/>
+<path d="M4.5 12c0 2-.4 3.8-1.1 5.3"/><path d="M15.5 11c0 2.6-.5 5.1-1.5 7.4"/><path d="M8.5 11a3.5 3.5 0 0 1 7 0"/><path d="M8.5 11c0 2.2-.6 4.3-1.7 6.1"/><path d="M18.2 18.6c.3-.8.6-1.6.8-2.5"/></svg>`;
+
+async function paneObjetivo(){
+  // refresca por si el sorteo se hizo con la sesión abierta
+  try{ ME.data=await api("/api/login",{name:ME.name,pin:ME.pin}) }catch{}
+  const d=ME.data;
+  if(!d.drawn){
+    let missing=[]; try{ await loadState(); missing=G.people.filter(p=>!(p.joined&&p.items)).map(p=>p.name) }catch{}
+    $("#pane").innerHTML=`
+    <article class="dossier" data-num="—">
+      <div class="top"><span class="label">Objetivo asignado</span><span class="stamp">En espera</span></div>
+      <div class="locked">
+        <h2 style="font-size:clamp(34px,8vw,56px)">Aún no hay sorteo</h2>
+        <p class="note">La central sorteará cuando todos tengan su carta lista. ${missing.length?`Faltan: <b>${missing.map(esc).join(", ")}</b>.`:"¡Ya estáis todos! Falta que la central dé la orden."}</p>
+        <p class="note">Mientras, deja tu carta bien completa.</p>
+        <button class="btn sm" id="goC">Ir a mi carta</button>
+      </div>
+    </article>`;
+    $("#goC").onclick=()=>renderAgent("carta");
+    return;
+  }
+  $("#pane").innerHTML=`
+  <section class="center" style="padding-block:10px">
+    <p class="note" style="max-width:40ch">Tienes un expediente clasificado. Comprueba que nadie mira la pantalla y verifica tu identidad.</p>
+    <button class="finger" id="fp" aria-label="Mantén pulsado para verificar tu identidad">${FP_SVG}</button>
+    <span class="label" id="fph">Mantén el dedo encima</span>
+  </section>`;
+  const fp=$("#fp"), hint=$("#fph"); let t0=0, raf=0, held=false;
+  const NEED=reduced()?300:1400;
+  const tick=t=>{ if(!held) return; const p=Math.min(1,(t-t0)/NEED); fp.style.setProperty("--p",p);
+    if(p>=1){ held=false; hint.textContent="Descifrando…"; navigator.vibrate&&navigator.vibrate(60); openDossier(); return }
+    raf=requestAnimationFrame(tick) };
+  const start=e=>{ e.preventDefault(); if(held) return; held=true; t0=performance.now(); fp.classList.add("scan"); hint.textContent="Escaneando…"; raf=requestAnimationFrame(tick) };
+  const stop=()=>{ if(!held) return; held=false; cancelAnimationFrame(raf); fp.classList.remove("scan"); fp.style.setProperty("--p",0); hint.textContent="Sin soltar, hasta que se llene" };
+  fp.addEventListener("pointerdown",start); ["pointerup","pointerleave","pointercancel"].forEach(ev=>fp.addEventListener(ev,stop));
+  fp.addEventListener("keydown",e=>{ if((e.key===" "||e.key==="Enter")&&!e.repeat) start(e) });
+  fp.addEventListener("keyup",e=>{ if(e.key===" "||e.key==="Enter") stop() });
+  fp.addEventListener("contextmenu",e=>e.preventDefault());
+}
+
+async function openDossier(){
+  const d=ME.data;
+  let a, target;
+  try{
+    a=await openAssignment(d.wrapped, ME.pin, d.assignment);
+    target=await api("/api/carta/of",{name:ME.name,pin:ME.pin,target:a.r});
+  }catch(e){
+    $("#pane").innerHTML=`<p class="msg">No se ha podido abrir tu expediente. ${esc(e.message||"")}</p>`; return;
+  }
+  const budget=parseFloat(String(d.cfg.budget).replace(",","."))||null;
+  const tc=target.carta||{f:{},it:[]}; tc.it=tc.it||[]; const f=tc.f||{};
+  const hasF=f.w1||f.w2||f.w3||f.w4;
+  $("#pane").innerHTML=`
+  <article class="dossier" data-num="${esc(code(ME.name).slice(3))}-${String(a.r.length*7+11).padStart(3,"0")}">
+    <div class="top">
+      <dl class="kv">
+        <dt>Agente</dt><dd>${esc(ME.name)}</dd>
+        <dt>Fondos</dt><dd>máximo ${esc(d.cfg.budget)} €</dd>
+        <dt>Día D</dt><dd>${esc(fmtDate(d.cfg.date))}</dd>
+      </dl>
+      <span class="stamp">Confidencial</span>
     </div>
-    <p class="note" id="wsize">Truco: si pegas el enlace de Amazon o de otra tienda, WhatsApp ya enseña la foto del producto.</p>
-  </section>
-  <p class="foot">Shhh · No se lo digas a nadie</p>`;
+    <div style="display:grid;gap:8px">
+      <span class="label">Objetivo asignado</span>
+      <div class="scratch" id="sc"><span class="name">${esc(a.r)}</span><canvas id="scc" aria-hidden="true"></canvas><span class="assigned" id="as">Asignado</span></div>
+      <div class="scratch-tip"><span id="tip">Rasca la franja tachada con el dedo</span><button class="linkbtn" type="button" id="skip">Revelar sin rascar</button></div>
+    </div>
+    <div id="post" hidden style="display:grid;gap:22px">
+      ${a.m?`<div class="mission"><b>Misión secreta</b><p>${esc(a.m)}</p><span class="note">El día del intercambio el grupo votará si la has cumplido.</span></div>`:""}
+      <div style="display:grid;gap:8px"><span class="label">Cuenta atrás para el Día D</span><div class="count" id="cd"></div></div>
+      <div class="tcarta">
+        <div class="head"><h3>La carta de ${esc(a.r)}</h3><span class="label">${tc.it.length} ${tc.it.length===1?"deseo":"deseos"}</span></div>
+        ${tc.it.length?`<div class="wl">${tc.it.map((x,i)=>itemCard(x,i,false)).join("")}</div>`:`<p class="note">No ha puesto nada en su carta. Tira de las ideas de abajo o de lo que sabes de ${esc(a.r)}.</p>`}
+        ${hasF?`<dl class="kv">${f.w1?`<dt>Le flipa</dt><dd>${esc(f.w1)}</dd>`:""}${f.w2?`<dt>Le haría ilusión</dt><dd>${esc(f.w2)}</dd>`:""}${f.w3?`<dt>Ni se te ocurra</dt><dd>${esc(f.w3)}</dd>`:""}${f.w4?`<dt>Talla</dt><dd>${esc(f.w4)}</dd>`:""}</dl>`:""}
+      </div>
+      <button class="btn sm" type="button" id="hide" style="justify-self:start">Tapar el expediente</button>
+    </div>
+  </article>
+  <section class="panel" id="extras" hidden aria-labelledby="h-id">
+    <div class="head"><h2 id="h-id">Material de apoyo</h2><span class="label">${budget!=null?"hasta "+esc(d.cfg.budget)+" €":"ideas"}</span></div>
+    <p class="note">Más ideas por si su carta se te queda corta. Precios aproximados.</p>
+    <div class="ideas" id="ideas"></div>
+    <div class="row"><button class="btn sm" type="button" id="more">Otras ideas</button></div>
+  </section>`;
+  fixImgs($("#pane"));
 
-  // Rasca y gana
   const wrap=$("#sc"), cv=$("#scc"), ctx=cv.getContext("2d");
   let revealed=false, moves=0, last=null;
   const paint=()=>{
-    const r=wrap.getBoundingClientRect(), d=devicePixelRatio||1;
-    cv.width=r.width*d; cv.height=r.height*d; ctx.setTransform(d,0,0,d,0,0);
-    ctx.globalCompositeOperation="source-over";
-    ctx.fillStyle="#0b0b0d"; ctx.fillRect(0,0,r.width,r.height);
+    const r=wrap.getBoundingClientRect(), dp=devicePixelRatio||1;
+    cv.width=r.width*dp; cv.height=r.height*dp; ctx.setTransform(dp,0,0,dp,0,0);
+    ctx.globalCompositeOperation="source-over"; ctx.fillStyle="#0b0b0d"; ctx.fillRect(0,0,r.width,r.height);
     ctx.fillStyle="rgba(255,255,255,.07)"; ctx.font="700 16px 'Special Elite', monospace";
     for(let y=18;y<r.height+20;y+=26) for(let x=(y/26%2)*-60;x<r.width;x+=130) ctx.fillText("CLASIFICADO",x,y);
     ctx.fillStyle="rgba(210,50,60,.9)"; ctx.font="900 20px 'Big Shoulders Stencil Display', Impact, sans-serif";
     ctx.textAlign="center"; ctx.fillText("▼ RASCA AQUÍ ▼", r.width/2, r.height/2+7); ctx.textAlign="start";
   };
-  paint();
-  document.fonts && document.fonts.ready.then(()=>{ if(!revealed&&moves===0) paint() });
+  paint(); document.fonts&&document.fonts.ready.then(()=>{ if(!revealed&&moves===0) paint() });
   const pos=e=>{ const r=cv.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top] };
-  const scratch=(a,b)=>{ ctx.globalCompositeOperation="destination-out"; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.lineWidth=38;
-    ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke() };
-  const cleared=()=>{ const d=ctx.getImageData(0,0,cv.width,cv.height).data; let c=0,n=0;
-    for(let i=3;i<d.length;i+=4*40){ n++; if(d[i]===0) c++ } return c/n };
+  const scratch=(p,q)=>{ ctx.globalCompositeOperation="destination-out"; ctx.lineCap="round"; ctx.lineWidth=38; ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(q[0],q[1]); ctx.stroke() };
+  const cleared=()=>{ const px=ctx.getImageData(0,0,cv.width,cv.height).data; let c=0,n=0; for(let i=3;i<px.length;i+=160){ n++; if(px[i]===0) c++ } return c/n };
   const reveal=()=>{
     if(revealed) return; revealed=true;
     cv.classList.add("gone"); $("#tip").textContent="Objetivo confirmado"; $("#skip").hidden=true;
-    setTimeout(()=>{ $("#as").classList.add("on"); navigator.vibrate&&navigator.vibrate([40,40,80]); shreds(2200) }, reduced()?0:350);
-    setTimeout(()=>{ ["#post","#extras","#carta"].forEach(s=>$(s).hidden=false); startCountdown(o.d); showIdeas(budget) }, reduced()?0:900);
+    setTimeout(()=>{ $("#as").classList.add("on"); navigator.vibrate&&navigator.vibrate([40,40,80]); shreds(2200) },reduced()?0:350);
+    setTimeout(()=>{ $("#post").hidden=false; $("#extras").hidden=false; startCountdown(d.cfg.date); showIdeas(budget) },reduced()?0:900);
   };
   cv.addEventListener("pointerdown",e=>{ cv.setPointerCapture(e.pointerId); last=pos(e); scratch(last,[last[0]+.1,last[1]]) });
   cv.addEventListener("pointermove",e=>{ if(!last||revealed) return; const p=pos(e); scratch(last,p); last=p; if(++moves%12===0&&cleared()>.5) reveal() });
   const up=()=>{ last=null; if(!revealed&&cleared()>.5) reveal() };
   cv.addEventListener("pointerup",up); cv.addEventListener("pointercancel",up);
   $("#skip").onclick=reveal;
-  $("#hide").onclick=()=>{ clearInterval(window.__cd); renderGate(o) };
-
-  bindCarta(o, wish);
+  $("#hide").onclick=()=>renderAgent("obj");
   $("#more").onclick=()=>showIdeas(budget);
-}
-
-// ================== Carta de deseos ==================
-const safeUrl = u => { u=String(u||"").trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u;
-  try{ const x=new URL(u); return /^https?:$/.test(x.protocol)&&x.hostname.includes(".") ? x.href : "" }catch{ return "" } };
-const safeImg = s => /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(s||"") ? s : safeUrl(s);
-const host = u => { try{ return new URL(u).hostname.replace(/^www\./,"") }catch{ return "" } };
-
-function b64u(bytes){ let s=""; for(let i=0;i<bytes.length;i+=0x8000) s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
-  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"") }
-function unb64u(t){ let s=t.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; const b=atob(s), u=new Uint8Array(b.length);
-  for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u }
-async function packCarta(obj){
-  const bytes=new TextEncoder().encode(JSON.stringify(obj));
-  if(window.CompressionStream){
-    try{ const st=new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"));
-      return "w"+b64u(new Uint8Array(await new Response(st).arrayBuffer())) }catch{}
-  }
-  return "x"+b64u(bytes);
-}
-async function unpackCarta(t){
-  try{
-    let bytes=unb64u(t.slice(1));
-    if(t[0]==="w"){ const st=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw")); bytes=new Uint8Array(await new Response(st).arrayBuffer()) }
-    const c=JSON.parse(new TextDecoder().decode(bytes));
-    if(!c||!c.n||!Array.isArray(c.it)) return null;
-    c.it=c.it.slice(0,20).map(x=>({t:String(x.t||"").slice(0,80),u:safeUrl(x.u),p:String(x.p||"").slice(0,8),n:String(x.n||"").slice(0,120),i:safeImg(x.i)})).filter(x=>x.t);
-    c.f=c.f||{}; return c;
-  }catch{ return null }
-}
-// Reduce la foto a una miniatura para que quepa en el enlace
-async function shrink(file){
-  const url=URL.createObjectURL(file);
-  try{
-    const img=new Image(); await new Promise((ok,ko)=>{ img.onload=ok; img.onerror=ko; img.src=url });
-    const k=Math.min(1,200/Math.max(img.naturalWidth,img.naturalHeight));
-    const c=document.createElement("canvas"); c.width=Math.max(1,Math.round(img.naturalWidth*k)); c.height=Math.max(1,Math.round(img.naturalHeight*k));
-    const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height);
-    let d=c.toDataURL("image/webp",.55); if(!d.startsWith("data:image/webp")) d=c.toDataURL("image/jpeg",.6);
-    return d;
-  } finally { URL.revokeObjectURL(url) }
-}
-
-function itemCard(x,i,edit){
-  return `<article class="wi">
-    <div class="ph">${x.i?`<img src="${esc(x.i)}" alt="${esc(x.t)}" loading="lazy">`:""}<span>${esc((x.t||"?")[0].toUpperCase())}</span></div>
-    <div class="bd">
-      <span class="t"><span class="n">${i+1}</span>${esc(x.t)}</span>
-      <div class="meta">${x.p?`<span class="pr">~${esc(x.p)} €</span>`:""}${x.u?`<span>${esc(host(x.u))}</span>`:""}</div>
-      ${x.n?`<p class="note">${esc(x.n)}</p>`:""}
-      <div class="acts">
-        ${x.u?`<a class="btn sm" href="${esc(x.u)}" target="_blank" rel="noopener noreferrer">Ver en la tienda</a>`:""}
-        ${edit?`<button class="btn sm" type="button" data-up="${i}" ${i?"":"disabled"} aria-label="Subir prioridad">▲</button>
-          <button class="btn sm" type="button" data-ed="${i}">Editar</button>
-          <button class="btn sm" type="button" data-rm="${i}">Quitar</button>`:""}
-      </div>
-    </div>
-  </article>`;
-}
-const fixImgs = root => $$(".ph img",root).forEach(im=>{ const f=()=>im.remove(); im.complete&&!im.naturalWidth&&im.src ? f() : im.addEventListener("error",f) });
-
-function cartaText(c,url){
-  let t=`🎁 Carta de deseos de ${c.n}\n`;
-  c.it.forEach((x,i)=>{ t+=`\n${i+1}. ${x.t}${x.p?` (~${x.p} €)`:""}`; if(x.n) t+=`\n   ${x.n}`; if(x.u) t+=`\n   ${x.u}` });
-  const f=c.f||{};
-  if(f.w1||f.w2||f.w3||f.w4) t+="\n";
-  if(f.w1) t+=`\n• Me flipa: ${f.w1}`; if(f.w2) t+=`\n• Me haría ilusión algo de: ${f.w2}`;
-  if(f.w3) t+=`\n• Ni se te ocurra: ${f.w3}`; if(f.w4) t+=`\n• Talla: ${f.w4}`;
-  t+= url ? `\n\n📸 Con fotos: ${url}` : `\n\n📸 La carta con fotos te la paso aparte.`;
-  return t;
-}
-
-function bindCarta(o, oldFicha){
-  const key="carta-"+o.g;
-  const C=store.get(key)||{f:{w1:oldFicha.w1||"",w2:oldFicha.w2||"",w3:oldFicha.w3||"",w4:oldFicha.w4||""},it:[]};
-  let editing=-1, img="", seq=0, link="";
-  ["w1","w2","w3","w4"].forEach(k=>{ const el=$("#"+k); el.value=C.f[k]||""; el.addEventListener("input",()=>{ C.f[k]=el.value.trim(); persist() }) });
-
-  const persist=()=>{ store.set(key,C); share() };
-  const share=async()=>{
-    const my=++seq;
-    const tok=await packCarta({n:o.g,e:o.e,f:C.f,it:C.it});
-    if(my!==seq) return;
-    link=BASE+"#"+tok;
-    const empty=!C.it.length&&!Object.values(C.f).some(Boolean);
-    let wa="https://wa.me/?text="+encodeURIComponent(cartaText({n:o.g,f:C.f,it:C.it},link));
-    const long = wa.length>6000;
-    if(long) wa="https://wa.me/?text="+encodeURIComponent(cartaText({n:o.g,f:C.f,it:C.it},""));
-    const a=$("#wsend"); a.href=wa; a.toggleAttribute("aria-disabled",empty); a.style.opacity=empty?.5:1; a.style.pointerEvents=empty?"none":"";
-    $("#wview").href=link;
-    const hasPhoto=C.it.some(x=>x.i&&x.i.startsWith("data:"));
-    $("#wsize").textContent = long
-      ? "Tu carta lleva muchas fotos subidas y el enlace es muy largo para meterlo en el WhatsApp. Manda primero la lista y luego pega el enlace con «Copiar enlace»."
-      : hasPhoto ? "Las fotos subidas van dentro del enlace en miniatura. Si añades muchas, el enlace se hace muy largo."
-      : "Truco: si pegas el enlace de Amazon o de otra tienda, WhatsApp ya enseña la foto del producto.";
-  };
-
-  const draw=()=>{
-    const wl=$("#wl");
-    wl.innerHTML = C.it.length ? C.it.map((x,i)=>itemCard(x,i,true)).join("")
-      : `<div class="wempty"><b>Tu carta está vacía</b><span>Añade abajo lo primero que te gustaría recibir.</span></div>`;
-    fixImgs(wl);
-    $$("[data-rm]",wl).forEach(b=>b.onclick=()=>{ C.it.splice(+b.dataset.rm,1); if(editing>=0) resetForm(); persist(); draw() });
-    $$("[data-up]",wl).forEach(b=>b.onclick=()=>{ const i=+b.dataset.up; [C.it[i-1],C.it[i]]=[C.it[i],C.it[i-1]]; persist(); draw() });
-    $$("[data-ed]",wl).forEach(b=>b.onclick=()=>{ const i=+b.dataset.ed, x=C.it[i]; editing=i;
-      $("#wt").value=x.t; $("#wu").value=x.u; $("#wp").value=x.p; $("#wn").value=x.n; setImg(x.i);
-      $("#wiu").value = x.i&&!x.i.startsWith("data:") ? x.i : "";
-      $("#wfh").textContent="Editando el deseo "+(i+1); $("#wsave").textContent="Guardar cambios"; $("#wcancel").hidden=false;
-      $("#wf").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"}); $("#wt").focus() });
-  };
-  const setImg=v=>{ img=v||""; const th=$("#wthumb"); th.hidden=!img; if(img) th.src=img; else th.removeAttribute("src"); $("#wclr").hidden=!img };
-  const resetForm=()=>{ editing=-1; $("#wf").reset(); setImg(""); $("#wfh").textContent="Añadir un deseo"; $("#wsave").textContent="Añadir a mi carta"; $("#wcancel").hidden=true; $("#wmsg").textContent="" };
-
-  $("#wthumb").addEventListener("error",()=>{ if(img&&!img.startsWith("data:")){ $("#wmsg").textContent="Esa imagen no se puede cargar. Prueba con otra o súbela."; setImg("") } });
-  $("#wpick").onclick=()=>$("#wfile").click();
-  $("#wfile").onchange=async e=>{ const f=e.target.files[0]; if(!f) return;
-    $("#wmsg").textContent="Preparando foto…";
-    try{ setImg(await shrink(f)); $("#wiu").value=""; $("#wmsg").textContent="" }catch{ $("#wmsg").textContent="No se pudo leer esa foto. Prueba con otra." }
-    e.target.value="" };
-  $("#wiu").addEventListener("input",e=>{ const u=safeUrl(e.target.value); if(u||!e.target.value) { $("#wmsg").textContent=""; setImg(u) } });
-  $("#wclr").onclick=()=>{ setImg(""); $("#wiu").value="" };
-  $("#wcancel").onclick=resetForm;
-  $("#wf").onsubmit=e=>{
-    e.preventDefault();
-    const t=$("#wt").value.trim(); if(!t){ $("#wmsg").textContent="Pon al menos qué es."; $("#wt").focus(); return }
-    const raw=$("#wu").value.trim(), u=safeUrl(raw);
-    if(raw&&!u){ $("#wmsg").textContent="Ese enlace no parece una web. Cópialo entero desde la tienda."; $("#wu").focus(); return }
-    if(editing<0 && C.it.length>=20){ $("#wmsg").textContent="Máximo 20 deseos. ¡No te pases!"; return }
-    const x={t,u,p:$("#wp").value.trim().replace(/[^\d.,]/g,""),n:$("#wn").value.trim(),i:img};
-    if(editing>=0) C.it[editing]=x; else C.it.push(x);
-    resetForm(); persist(); draw();
-    $("#wmsg").textContent="Guardado en tu carta.";
-  };
-  $("#wcopy").onclick=()=>{ const b=$("#wcopy");
-    const ok=()=>{ b.textContent="¡Copiado!"; setTimeout(()=>b.textContent="Copiar enlace",1500) };
-    const fail=()=>{ $("#wsize").textContent=link; const r=document.createRange(); r.selectNodeContents($("#wsize")); const s=getSelection(); s.removeAllRanges(); s.addRange(r) };
-    try{ navigator.clipboard.writeText(link).then(ok,fail) }catch{ fail() } };
-  draw(); share();
-}
-
-function renderCarta(c){
-  const f=c.f||{};
-  $("#app").innerHTML=`
-  <div class="strip"><span>Información del objetivo</span><span>Carta de deseos</span><span>${esc(code(c.n))}</span></div>
-  <header class="hero">
-    <span class="label">${esc(c.e||"Amigo Invisible")}</span>
-    <h1>Carta de<em>${esc(c.n)}</em></h1>
-    <p>Si eres su amigo invisible, toma nota y disimula. Están por orden: lo primero es lo que más ilusión le haría.</p>
-  </header>
-  ${c.it.length?`<section class="wl">${c.it.map((x,i)=>itemCard(x,i,false)).join("")}</section>`:""}
-  ${(f.w1||f.w2||f.w3||f.w4)?`<section class="panel"><h2>Más pistas</h2><dl class="kv kv-dark">
-    ${f.w1?`<dt>Le flipa</dt><dd>${esc(f.w1)}</dd>`:""}${f.w2?`<dt>Le haría ilusión</dt><dd>${esc(f.w2)}</dd>`:""}
-    ${f.w3?`<dt>Ni se te ocurra</dt><dd>${esc(f.w3)}</dd>`:""}${f.w4?`<dt>Talla</dt><dd>${esc(f.w4)}</dd>`:""}</dl></section>`:""}
-  ${!c.it.length&&!(f.w1||f.w2||f.w3||f.w4)?`<p class="note">Esta carta está vacía.</p>`:""}
-  <p class="foot">Shhh · Que no te pillen mirando</p>`;
-  fixImgs($("#app"));
 }
 
 function showIdeas(budget){
   const pool=IDEAS.filter(([,p])=>budget==null||p<=budget);
   $("#ideas").innerHTML=shuffle(pool).slice(0,6).map(([t,p])=>`<div class="idea"><span>${esc(t)}</span><span>${p?"~"+p+" €":"gratis"}</span></div>`).join("");
 }
-
 function startCountdown(iso){
   const el=$("#cd"); if(!el||!iso) return;
   const target=new Date(iso+"T00:00:00").getTime();
-  const f=()=>{ let s=Math.max(0,Math.floor((target-Date.now())/1000));
+  const f=()=>{ if(!el.isConnected) return clearInterval(window.__cd);
+    let s=Math.max(0,Math.floor((target-Date.now())/1000));
     if(s===0){ el.innerHTML=`<div><strong>¡Hoy!</strong><span>Día D</span></div>`; return }
-    const d=Math.floor(s/86400); s%=86400; const h=Math.floor(s/3600); s%=3600; const m=Math.floor(s/60); s%=60;
-    el.innerHTML=[[d,"días"],[h,"horas"],[m,"min"],[s,"seg"]].map(([v,l])=>`<div><strong>${String(v).padStart(2,"0")}</strong><span>${l}</span></div>`).join("") };
+    const dd=Math.floor(s/86400); s%=86400; const h=Math.floor(s/3600); s%=3600; const m=Math.floor(s/60); s%=60;
+    el.innerHTML=[[dd,"días"],[h,"horas"],[m,"min"],[s,"seg"]].map(([v,l])=>`<div><strong>${String(v).padStart(2,"0")}</strong><span>${l}</span></div>`).join("") };
   f(); clearInterval(window.__cd); window.__cd=setInterval(f,1000);
 }
 
-function renderBroken(){
-  $("#app").innerHTML=`<div class="strip"><span>Error</span><span>Expediente dañado</span><span>—</span></div>
-  <section class="gate"><h1>Expediente<br><em>dañado</em></h1>
-  <p>Este enlace llegó cortado o mal copiado. Pide a la central que te lo reenvíe entero.</p></section>`;
+// ================== Panel de la central (organizador) ==================
+async function renderAdmin(){
+  stopTimers();
+  const key=store.get(ADMIN_KEY);
+  let A;
+  try{ A=await api("/api/admin/state",null,key) }
+  catch(e){ if(e.status===403){ store.set(ADMIN_KEY,null); return renderError("La clave de organizador no vale. Abre otra vez tu enlace de organizador.", renderHome) } return renderError(e.message, renderAdmin) }
+  const c=A.cfg, n=A.people.length, joined=A.people.filter(p=>p.joined).length, ready=A.people.filter(p=>p.joined&&p.items).length;
+  const missing=A.people.filter(p=>!p.joined).map(p=>p.name);
+  const order=store.get("ai-order");
+  const invite=`🕵️ ${c.event}\nEntra, elige tu nombre, ponte un PIN y escribe tu carta de deseos (lo que te gustaría recibir, con enlaces y fotos). Cuando estemos todos, hago el sorteo.\n${PAGE}`;
+  $("#app").innerHTML=`
+  <div class="strip"><span>Alto secreto</span><span>Central de operaciones</span><span>Organizador</span></div>
+  <header class="head">
+    <div style="display:grid;gap:6px"><span class="label">${esc(c.event)}</span><h1 style="font-size:clamp(44px,11vw,88px)">La <span style="color:var(--lamp)">central</span></h1></div>
+    <button class="btn sm ghost" id="home">Volver al inicio</button>
+  </header>
+
+  <section class="panel" aria-labelledby="h-inv">
+    <div class="head"><h2 id="h-inv">1 · Invitar</h2><span class="label">Un enlace para todos</span></div>
+    <p class="note">Manda este enlace al grupo. Cada uno elige su nombre, se pone un PIN y escribe su carta. Tú también: entra desde «Volver al inicio».</p>
+    <div class="row"><a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(invite)}" target="_blank" rel="noopener">Mandar al grupo por WhatsApp</a>
+      <button class="btn sm" id="cpy">Copiar enlace</button></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-st">
+    <div class="head"><h2 id="h-st">2 · Seguimiento</h2><span class="label">${joined}/${n} registrados · ${ready}/${n} con carta</span></div>
+    <div class="progress" aria-hidden="true"><span style="width:${n?ready/n*100:0}%"></span></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Agente</th><th>Registro</th><th>Deseos</th><th></th></tr></thead>
+      <tbody>${A.people.map(p=>`<tr>
+        <td><b>${esc(p.name)}</b></td>
+        <td>${p.locked?`<span class="pill lock">Bloqueado 10 min</span>`:p.joined?`<span class="pill ok">Registrado</span>`:`<span class="pill no">Pendiente</span>`}</td>
+        <td>${p.items}</td>
+        <td>${p.joined&&!A.drawn?`<button class="btn sm ghost" data-reset="${esc(p.name)}">Resetear PIN</button>`:""}</td></tr>`).join("")}</tbody>
+    </table></div>
+    <p class="note">«Resetear PIN» sirve si alguien olvida su PIN antes del sorteo. Su carta no se borra.</p>
+    <span class="msg" id="rmsg" role="status"></span>
+  </section>
+
+  <section class="panel" aria-labelledby="h-op">
+    <div class="head"><h2 id="h-op">Ajustes</h2><span class="label">${A.drawn?"Agentes bloqueados por el sorteo":"Editables"}</span></div>
+    <div class="grid">
+      <div class="field"><label for="ev">Nombre en clave</label><input class="inp" id="ev" value="${esc(c.event)}"></div>
+      <div class="field"><label for="bu">Presupuesto máximo (€)</label><input class="inp" id="bu" inputmode="decimal" value="${esc(c.budget)}"></div>
+      <div class="field"><label for="da">Día del intercambio</label><input class="inp" id="da" type="date" value="${esc(c.date)}"></div>
+    </div>
+    <label class="switch" for="mi"><input type="checkbox" id="mi" ${c.missions?"checked":""} ${A.drawn?"disabled":""}>
+      <span><b>Misiones secretas</b><small>Cada agente recibe un reto para su regalo (envolverlo con periódico, que lleve algo rojo…).</small></span></label>
+    <div class="row"><button class="btn" id="saveCfg">Guardar ajustes</button><span class="msg" id="cmsg" role="status"></span></div>
+    ${A.drawn?"":`
+    <details>
+      <summary>Agentes y parejas vetadas</summary>
+      <div style="display:grid;gap:14px">
+        <div class="chips">${A.people.map(p=>`<span class="chip">${esc(p.name)}<button type="button" aria-label="Quitar a ${esc(p.name)}" data-del="${esc(p.name)}">✕</button></span>`).join("")}</div>
+        <form class="row" id="addf"><input class="inp" id="newp" placeholder="Añadir a alguien más" aria-label="Nombre"><button class="btn sm" type="submit">Añadir</button></form>
+        <span class="label">Parejas que no pueden tocarse</span>
+        <div class="chips">${(c.excl||[]).map(([a,b],i)=>`<span class="chip">${esc(a)} ⇄ ${esc(b)}<button type="button" aria-label="Quitar pareja" data-dx="${i}">✕</button></span>`).join("")||`<span class="note">Ninguna.</span>`}</div>
+        <div class="row">
+          <select class="inp" id="xa" aria-label="Agente A">${A.people.map(p=>`<option>${esc(p.name)}</option>`).join("")}</select><span>⇄</span>
+          <select class="inp" id="xb" aria-label="Agente B">${A.people.map((p,i)=>`<option ${i===1?"selected":""}>${esc(p.name)}</option>`).join("")}</select>
+          <button class="btn sm" type="button" id="xadd">Añadir pareja</button>
+        </div>
+      </div>
+    </details>`}
+  </section>
+
+  <section class="panel" aria-labelledby="h-dr">
+    <div class="head"><h2 id="h-dr">3 · Sorteo</h2><span class="label">${A.drawn?"Hecho":"Pendiente"}</span></div>
+    ${A.drawn?`
+      <p><b>Sorteo hecho.</b> Cada uno ya puede entrar con su PIN y ver su objetivo. Tú tampoco sabes quién le toca a quién: los resultados están cifrados con el PIN de cada uno.</p>
+      <div class="row"><a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(`🕵️ ${c.event}\n¡Sorteo hecho! Entrad con vuestro nombre y PIN para ver a quién le hacéis el regalo:\n${PAGE}`)}" target="_blank" rel="noopener">Avisar al grupo</a>
+        <button class="btn sm ghost" id="undo">Deshacer el sorteo</button></div>
+      <div class="row" id="undoC" hidden><span>Se borrarán los resultados y habrá que sortear de nuevo. ¿Seguro?</span><button class="btn sm danger" id="undoY">Sí, deshacer</button><button class="btn sm" id="undoN">Cancelar</button></div>`
+    :`
+      <p class="note">${missing.length?`Para sortear tienen que estar todos registrados. Faltan: <b>${missing.map(esc).join(", ")}</b>.`:ready<n?`Todos registrados. ${n-ready} aún no han puesto nada en su carta; puedes esperar o sortear ya.`:"Todo listo. Cuando quieras."}</p>
+      <div class="row"><button class="btn big" id="go" ${missing.length?"disabled":""}>Ejecutar sorteo</button></div>
+      <div class="row" id="goC" hidden><span>Después no se pueden cambiar los agentes. ¿Sorteamos?</span><button class="btn sm danger" id="goY">Sí, sortear</button><button class="btn sm" id="goN">Cancelar</button></div>`}
+    <span class="msg" id="dmsg" role="status"></span>
+  </section>
+
+  <section class="panel" aria-labelledby="h-dd">
+    <div class="head"><h2 id="h-dd">Día D</h2><span class="label">${esc(fmtDate(c.date))}</span></div>
+    <ol class="rules">
+      <li>Sale el agente que toque. Da <b>tres pistas</b> sobre su objetivo, de más difícil a más fácil, sin decir el nombre.</li>
+      <li>El resto intenta adivinar. Luego entrega el regalo.</li>
+      <li>Si había misión secreta, el grupo vota si la cumplió.</li>
+    </ol>
+    ${order?`<ol class="order">${order.map(p=>`<li>${esc(p)}</li>`).join("")}</ol>`:""}
+    <div class="row"><button class="btn" id="order">${order?"Sortear otro orden":"Sortear el orden de salida"}</button></div>
+  </section>
+  <p class="foot">Central · ${esc(c.event)}</p>`;
+
+  const cfgBody=()=>({event:$("#ev").value.trim(),budget:$("#bu").value.trim(),date:$("#da").value,missions:$("#mi").checked});
+  const call=async(path,body,msgEl)=>{ try{ await api(path,body,key); renderAdmin() }catch(e){ $(msgEl).textContent=e.message } };
+  $("#home").onclick=renderHome;
+  $("#cpy").onclick=()=>{ const b=$("#cpy"); try{ navigator.clipboard.writeText(PAGE).then(()=>b.textContent="¡Copiado!",()=>b.textContent=PAGE) }catch{ b.textContent=PAGE } };
+  $("#saveCfg").onclick=async()=>{ try{ await api("/api/admin/config",{cfg:cfgBody()},key); $("#cmsg").className="msg good"; $("#cmsg").textContent="Guardado." }catch(e){ $("#cmsg").className="msg"; $("#cmsg").textContent=e.message } };
+  $$("[data-reset]").forEach(b=>b.onclick=()=>{ if(b.dataset.armed){ call("/api/admin/resetpin",{name:b.dataset.reset},"#rmsg") } else { b.dataset.armed=1; b.textContent="¿Seguro? Pulsa otra vez" } });
+  $$("[data-del]").forEach(b=>b.onclick=()=>call("/api/admin/config",{people:A.people.map(p=>p.name).filter(x=>x!==b.dataset.del)},"#cmsg"));
+  const af=$("#addf"); if(af) af.onsubmit=e=>{ e.preventDefault(); const v=$("#newp").value.trim(); if(v) call("/api/admin/config",{people:[...A.people.map(p=>p.name),v]},"#cmsg") };
+  $$("[data-dx]").forEach(b=>b.onclick=()=>{ const ex=(c.excl||[]).slice(); ex.splice(+b.dataset.dx,1); call("/api/admin/config",{excl:ex},"#cmsg") });
+  const xa=$("#xadd"); if(xa) xa.onclick=()=>{ const a=$("#xa").value,b=$("#xb").value; if(a!==b) call("/api/admin/config",{excl:[...(c.excl||[]),[a,b]]},"#cmsg") };
+  const go=$("#go"); if(go){ go.onclick=()=>$("#goC").hidden=false; $("#goN").onclick=()=>$("#goC").hidden=true;
+    $("#goY").onclick=async()=>{ $("#dmsg").textContent="Sorteando…"; try{ await api("/api/admin/config",{cfg:cfgBody()},key); await api("/api/admin/draw",{},key); shreds(1500); renderAdmin() }catch(e){ $("#dmsg").textContent=e.message } } }
+  const un=$("#undo"); if(un){ un.onclick=()=>$("#undoC").hidden=false; $("#undoN").onclick=()=>$("#undoC").hidden=true; $("#undoY").onclick=()=>call("/api/admin/undraw",{},"#dmsg") }
+  $("#order").onclick=()=>{ store.set("ai-order",shuffle(A.people.map(p=>p.name))); renderAdmin() };
+  timer=setInterval(async()=>{ if(document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    try{ const B=await api("/api/admin/state",null,key); if(JSON.stringify(B.people)!==JSON.stringify(A.people)||B.drawn!==A.drawn) renderAdmin() }catch{} },20000);
 }
 
 // ================== Papel triturado (confeti) ==================
@@ -789,16 +798,16 @@ function shreds(ms){
 }
 
 // ================== Arranque ==================
-function route(){
-  clearInterval(window.__cd);
-  const h=location.hash.slice(1);
-  if(!h) return renderHQ();
-  if(h[0]==="w"||h[0]==="x"){ unpackCarta(h).then(c=>c?renderCarta(c):renderBroken()); scrollTo(0,0); return }
-  const o=decode(h); o?renderGate(o):renderBroken();
-  scrollTo(0,0);
-}
-addEventListener("hashchange",route);
-route();
+(async function boot(){
+  const m=location.hash.match(/^#admin=([\w-]+)$/);
+  if(m){ store.set(ADMIN_KEY,m[1]); history.replaceState(null,"",location.pathname); return renderAdmin() }
+  const me=store.get(ME_KEY);
+  if(me&&me.name&&me.pin){
+    try{ await loadState(); await enterAgent(me.name,me.pin); return }
+    catch(e){ if(e.status===401||e.status===404||e.status===409) store.set(ME_KEY,null) }
+  }
+  renderHome();
+})();
 </script>
 </body>
 </html>

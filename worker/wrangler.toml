@@ -1,0 +1,9 @@
+name = "amigo-invisible"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "amigo-invisible"
+database_id = "feb43b40-bea8-4d1a-aaaa-6325b5724ce4"

@@ -1,0 +1,4 @@
+worker/node_modules/
+worker/.wrangler/
+ORGANIZADOR*.txt
+.dev.vars
