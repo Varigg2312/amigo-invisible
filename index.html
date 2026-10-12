@@ -714,7 +714,7 @@ async function renderAdmin(){
     <div class="grid">
       <div class="field"><label for="ev">Nombre en clave</label><input class="inp" id="ev" value="${esc(c.event)}"></div>
       <div class="field"><label for="bu">Presupuesto máximo (€)</label><input class="inp" id="bu" inputmode="decimal" value="${esc(c.budget)}"></div>
-      <div class="field"><label for="da">Día del intercambio</label><input class="inp" id="da" type="date" value="${esc(c.date)}"></div>
+      <div class="field"><label for="da">Día del intercambio (Día D)</label><input class="inp" id="da" type="date" value="${esc(c.date)}" ${A.sealed?"disabled":""}></div>
     </div>
     <label class="switch" for="mi"><input type="checkbox" id="mi" ${c.missions?"checked":""} ${A.drawn?"disabled":""}>
       <span><b>Misiones secretas</b><small>Cada agente recibe un reto para su regalo (envolverlo con periódico, que lleve algo rojo…).</small></span></label>
@@ -740,8 +740,11 @@ async function renderAdmin(){
     <div class="head"><h2 id="h-dr">3 · Sorteo</h2><span class="label">${A.drawn?"Hecho":"Pendiente"}</span></div>
     ${A.drawn?`
       <p><b>Sorteo hecho.</b> Cada uno ya puede entrar con su PIN y ver su objetivo. Tú tampoco sabes quién le toca a quién: los resultados están cifrados con el PIN de cada uno.</p>
+      ${A.sealed
+        ? `<p class="msg good">Sorteo sellado: ha llegado el Día D. El resultado ya no se puede deshacer ni repetir, y la fecha no se puede mover.</p>`
+        : `<p class="note">Puedes deshacerlo hasta el día antes del Día D (${esc(fmtDate(c.date))}). Ese día el sorteo queda sellado para siempre.</p>`}
       <div class="row"><a class="btn wa" href="https://wa.me/?text=${encodeURIComponent(`🕵️ ${c.event}\n¡Sorteo hecho! Entrad con vuestro nombre y PIN para ver a quién le hacéis el regalo:\n${PAGE}`)}" target="_blank" rel="noopener">Avisar al grupo</a>
-        <button class="btn sm ghost" id="undo">Deshacer el sorteo</button></div>
+        ${A.sealed?"":`<button class="btn sm ghost" id="undo">Deshacer el sorteo</button>`}</div>
       <div class="row" id="undoC" hidden><span>Se borrarán los resultados y habrá que sortear de nuevo. ¿Seguro?</span><button class="btn sm danger" id="undoY">Sí, deshacer</button><button class="btn sm" id="undoN">Cancelar</button></div>`
     :`
       <p class="note">${missing.length?`Para sortear tienen que estar todos registrados. Faltan: <b>${missing.map(esc).join(", ")}</b>.`:ready<n?`Todos registrados. ${n-ready} aún no han puesto nada en su carta; puedes esperar o sortear ya.`:"Todo listo. Cuando quieras."}</p>
@@ -762,7 +765,7 @@ async function renderAdmin(){
   </section>
   <p class="foot">Central · ${esc(c.event)}</p>`;
 
-  const cfgBody=()=>({event:$("#ev").value.trim(),budget:$("#bu").value.trim(),date:$("#da").value,missions:$("#mi").checked});
+  const cfgBody=()=>{ const b={event:$("#ev").value.trim(),budget:$("#bu").value.trim(),missions:$("#mi").checked}; if(!A.sealed) b.date=$("#da").value; return b };
   const call=async(path,body,msgEl)=>{ try{ await api(path,body,key); renderAdmin() }catch(e){ $(msgEl).textContent=e.message } };
   $("#home").onclick=renderHome;
   $("#cpy").onclick=()=>{ const b=$("#cpy"); try{ navigator.clipboard.writeText(PAGE).then(()=>b.textContent="¡Copiado!",()=>b.textContent=PAGE) }catch{ b.textContent=PAGE } };
@@ -777,7 +780,7 @@ async function renderAdmin(){
   const un=$("#undo"); if(un){ un.onclick=()=>$("#undoC").hidden=false; $("#undoN").onclick=()=>$("#undoC").hidden=true; $("#undoY").onclick=()=>call("/api/admin/undraw",{},"#dmsg") }
   $("#order").onclick=()=>{ store.set("ai-order",shuffle(A.people.map(p=>p.name))); renderAdmin() };
   timer=setInterval(async()=>{ if(document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
-    try{ const B=await api("/api/admin/state",null,key); if(JSON.stringify(B.people)!==JSON.stringify(A.people)||B.drawn!==A.drawn) renderAdmin() }catch{} },20000);
+    try{ const B=await api("/api/admin/state",null,key); if(JSON.stringify(B.people)!==JSON.stringify(A.people)||B.drawn!==A.drawn||B.sealed!==A.sealed) renderAdmin() }catch{} },20000);
 }
 
 // ================== Papel triturado (confeti) ==================

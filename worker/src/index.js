@@ -55,6 +55,10 @@ async function isDrawn(env) {
   const r = await env.DB.prepare("SELECT v FROM kv WHERE k='drawn'").first();
   return r ? r.v === "1" : false;
 }
+// Fecha de hoy en España (YYYY-MM-DD). El Día D se cuenta en hora de Madrid.
+const todayMadrid = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+// Sellado: con el sorteo hecho y el Día D ya llegado, el resultado no se puede deshacer ni repetir, y la fecha no se puede mover.
+const isSealed = (cfg, drawn) => drawn && !!cfg.date && todayMadrid() >= cfg.date;
 const people = env => env.DB.prepare("SELECT * FROM people ORDER BY pos, name").all().then(r => r.results);
 
 function cleanCarta(c) {
@@ -124,7 +128,7 @@ export default {
       // ---------- Público ----------
       if (path === "/api/state" && req.method === "GET") {
         const [cfg, drawn, list] = await Promise.all([getCfg(env), isDrawn(env), people(env)]);
-        return json({ cfg: { event: cfg.event, budget: cfg.budget, date: cfg.date, missions: cfg.missions }, drawn, people: publicPeople(list) });
+        return json({ cfg: { event: cfg.event, budget: cfg.budget, date: cfg.date, missions: cfg.missions }, drawn, sealed: isSealed(cfg, drawn), people: publicPeople(list) });
       }
 
       if (path === "/api/claim" && req.method === "POST") {
@@ -170,12 +174,14 @@ export default {
 
         if (path === "/api/admin/state" && req.method === "GET") {
           const [cfg, list] = await Promise.all([getCfg(env), people(env)]);
-          return json({ cfg, drawn, people: publicPeople(list).map((x, i) => ({ ...x, locked: list[i].lock_until > Date.now() })) });
+          return json({ cfg, drawn, sealed: isSealed(cfg, drawn), today: todayMadrid(), people: publicPeople(list).map((x, i) => ({ ...x, locked: list[i].lock_until > Date.now() })) });
         }
 
         if (path === "/api/admin/config" && req.method === "POST") {
           const cur = await getCfg(env);
           const c = body.cfg || {};
+          if (isSealed(cur, drawn) && c.date !== undefined && c.date !== cur.date)
+            return err("Ya ha llegado el Día D y el sorteo está sellado: la fecha no se puede cambiar.", 403);
           const cfg = {
             event: String(c.event ?? cur.event).slice(0, 60) || "Amigo Invisible",
             budget: String(c.budget ?? cur.budget).replace(/[^\d.,]/g, "").slice(0, 6),
@@ -226,6 +232,8 @@ export default {
         }
 
         if (path === "/api/admin/undraw" && req.method === "POST") {
+          if (isSealed(await getCfg(env), drawn))
+            return err("Ya ha llegado el Día D: el sorteo está sellado y no se puede deshacer ni repetir.", 403);
           await env.DB.batch([
             env.DB.prepare("UPDATE people SET assignment=NULL"),
             env.DB.prepare("INSERT INTO kv(k,v) VALUES('drawn','0') ON CONFLICT(k) DO UPDATE SET v='0'")
