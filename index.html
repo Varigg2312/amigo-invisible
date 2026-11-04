@@ -243,7 +243,9 @@ const store = {
 };
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 const code = name => { let h=7; for(const c of name) h=(h*31+c.charCodeAt(0))>>>0; return "AG-"+String(h%900+100) };
-const fmtDate = iso => { const d=new Date(iso+"T12:00:00"); return isNaN(d)?(iso||""):d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}) };
+const fmtDate = iso => { if(!iso) return "por definir"; const d=new Date(iso+"T12:00:00"); return isNaN(d)?iso:d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}) };
+// Presupuesto o fecha vacíos = "por definir"
+const money = b => b ? `máximo ${b} €` : "por definir";
 const daysTo = iso => { const d=new Date(iso+"T00:00:00"); if(isNaN(d)) return null; const t=new Date(); t.setHours(0,0,0,0); return Math.round((d-t)/864e5) };
 const safeUrl = u => { u=String(u||"").trim(); if(!u) return ""; if(!/^https?:\/\//i.test(u)) u="https://"+u;
   try{ const x=new URL(u); return /^https?:$/.test(x.protocol)&&x.hostname.includes(".") ? x.href : "" }catch{ return "" } };
@@ -314,8 +316,8 @@ async function renderHome(){
   <div class="phase">
     <b>${G.drawn?"Fase 2":"Fase 1"}</b>
     <span>${G.drawn
-      ? `Sorteo hecho. Presupuesto máximo <b>${esc(G.cfg.budget)} €</b>. Intercambio el ${esc(fmtDate(G.cfg.date))}.`
-      : `Apuntaos y escribid vuestra carta. ${ready} de ${n} cartas listas. Presupuesto máximo <b>${esc(G.cfg.budget)} €</b>.`}</span>
+      ? `Sorteo hecho. Presupuesto: <b>${esc(money(G.cfg.budget))}</b>. Día del intercambio: <b>${esc(fmtDate(G.cfg.date))}</b>.`
+      : `Apuntaos y escribid vuestra carta. ${ready} de ${n} cartas listas. Presupuesto: <b>${esc(money(G.cfg.budget))}</b>. Día del intercambio: <b>${esc(fmtDate(G.cfg.date))}</b>.`}</span>
   </div>
   <section class="panel" aria-labelledby="h-ag">
     <div class="head"><h2 id="h-ag">¿Quién eres?</h2><span class="label">${joined} de ${n} registrados</span></div>
@@ -595,7 +597,7 @@ async function openDossier(){
     <div class="top">
       <dl class="kv">
         <dt>Agente</dt><dd>${esc(ME.name)}</dd>
-        <dt>Fondos</dt><dd>máximo ${esc(d.cfg.budget)} €</dd>
+        <dt>Fondos</dt><dd>${esc(money(d.cfg.budget))}</dd>
         <dt>Día D</dt><dd>${esc(fmtDate(d.cfg.date))}</dd>
       </dl>
       <span class="stamp">Confidencial</span>
@@ -659,7 +661,8 @@ function showIdeas(budget){
   $("#ideas").innerHTML=shuffle(pool).slice(0,6).map(([t,p])=>`<div class="idea"><span>${esc(t)}</span><span>${p?"~"+p+" €":"gratis"}</span></div>`).join("");
 }
 function startCountdown(iso){
-  const el=$("#cd"); if(!el||!iso) return;
+  const el=$("#cd"); if(!el) return;
+  if(!iso){ el.innerHTML=`<div><strong>¿?</strong><span>Fecha por definir</span></div>`; return }
   const target=new Date(iso+"T00:00:00").getTime();
   const f=()=>{ if(!el.isConnected) return clearInterval(window.__cd);
     let s=Math.max(0,Math.floor((target-Date.now())/1000));
@@ -713,8 +716,8 @@ async function renderAdmin(){
     <div class="head"><h2 id="h-op">Ajustes</h2><span class="label">${A.drawn?"Agentes bloqueados por el sorteo":"Editables"}</span></div>
     <div class="grid">
       <div class="field"><label for="ev">Nombre en clave</label><input class="inp" id="ev" value="${esc(c.event)}"></div>
-      <div class="field"><label for="bu">Presupuesto máximo (€)</label><input class="inp" id="bu" inputmode="decimal" value="${esc(c.budget)}"></div>
-      <div class="field"><label for="da">Día del intercambio (Día D)</label><input class="inp" id="da" type="date" value="${esc(c.date)}" ${A.sealed?"disabled":""}></div>
+      <div class="field"><label for="bu">Presupuesto máximo (€) · vacío = por definir</label><input class="inp" id="bu" inputmode="decimal" placeholder="Por definir" value="${esc(c.budget)}"></div>
+      <div class="field"><label for="da">Día del intercambio (Día D) · vacío = por definir</label><input class="inp" id="da" type="date" value="${esc(c.date)}" ${A.sealed?"disabled":""}></div>
     </div>
     <label class="switch" for="mi"><input type="checkbox" id="mi" ${c.missions?"checked":""} ${A.drawn?"disabled":""}>
       <span><b>Misiones secretas</b><small>Cada agente recibe un reto para su regalo (envolverlo con periódico, que lleve algo rojo…).</small></span></label>

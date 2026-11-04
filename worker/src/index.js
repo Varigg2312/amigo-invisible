@@ -185,7 +185,7 @@ export default {
           const cfg = {
             event: String(c.event ?? cur.event).slice(0, 60) || "Amigo Invisible",
             budget: String(c.budget ?? cur.budget).replace(/[^\d.,]/g, "").slice(0, 6),
-            date: /^\d{4}-\d{2}-\d{2}$/.test(c.date || "") ? c.date : cur.date,
+            date: c.date === "" ? "" : /^\d{4}-\d{2}-\d{2}$/.test(c.date || "") ? c.date : cur.date,  // "" = por definir
             missions: c.missions === undefined ? cur.missions : !!c.missions,
             excl: cur.excl
           };
